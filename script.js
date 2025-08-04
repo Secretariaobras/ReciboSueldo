@@ -7,11 +7,13 @@ class GestorRecibos {
         this.usuarios = {};
         this.usuarioActual = null;
         this.recibosFiltrados = [];
+        this.todosLosRecibos = [];
 
         this.selectorDependencia = null;
         this.botonCargar = null;
         this.cargando = null;
         this.contenedorRecibos = null;
+        this.inputLegajo = null;
 
         this.inicializar();
     }
@@ -22,35 +24,12 @@ class GestorRecibos {
             this.mostrarLogin();
         } catch (error) {
             document.body.innerHTML = `
-                <div style="
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    min-height: 100vh;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    font-family: Arial, sans-serif;
-                    color: white;
-                    text-align: center;
-                ">
-                    <div style="
-                        background: rgba(255,255,255,0.1);
-                        padding: 40px;
-                        border-radius: 15px;
-                        backdrop-filter: blur(10px);
-                    ">
+                <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: Arial, sans-serif; color: white; text-align: center;">
+                    <div style="background: rgba(255,255,255,0.1); padding: 40px; border-radius: 15px; backdrop-filter: blur(10px);">
                         <h2>❌ Error de conexión</h2>
                         <p>No se pudieron cargar los usuarios del sistema.</p>
                         <p>Verifica tu conexión a internet y la configuración de la hoja de cálculo.</p>
-                        <button onclick="location.reload()" style="
-                            padding: 10px 20px;
-                            background: white;
-                            color: #667eea;
-                            border: none;
-                            border-radius: 5px;
-                            cursor: pointer;
-                            font-weight: bold;
-                            margin-top: 20px;
-                        ">
+                        <button onclick="location.reload()" style="padding: 10px 20px; background: white; color: #667eea; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 20px;">
                             🔄 Intentar nuevamente
                         </button>
                     </div>
@@ -89,74 +68,26 @@ class GestorRecibos {
 
     obtenerHTMLLogin() {
         return `
-            <div class="login-container" style="
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                font-family: Arial, sans-serif;
-            ">
-                <div class="login-form" style="
-                    background: white;
-                    padding: 40px;
-                    border-radius: 15px;
-                    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-                    width: 350px;
-                    text-align: center;
-                ">
-                    <h2 style="color: #333; margin-bottom: 30px; font-size: 28px;">
-                        Sistema de Recibos
-                    </h2>
+            <div class="login-container" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: Arial, sans-serif;">
+                <div class="login-form" style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 350px; text-align: center;">
+                    <h2 style="color: #333; margin-bottom: 30px; font-size: 28px;">Sistema de Recibos</h2>
                     <p style="color: #666; margin-bottom: 25px;">Inicia sesión para acceder</p>
                     
                     <form id="loginForm">
                         <div style="margin-bottom: 20px; text-align: left;">
                             <label style="color: #555; font-weight: bold;">Usuario:</label>
-                            <input type="text" id="username" required style="
-                                width: 100%;
-                                padding: 12px;
-                                border: 2px solid #e1e1e1;
-                                border-radius: 8px;
-                                font-size: 16px;
-                                margin-top: 5px;
-                                box-sizing: border-box;
-                            ">
+                            <input type="text" id="username" required style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; margin-top: 5px; box-sizing: border-box;">
                         </div>
                         <div style="margin-bottom: 25px; text-align: left;">
                             <label style="color: #555; font-weight: bold;">Contraseña:</label>
-                            <input type="password" id="password" required style="
-                                width: 100%;
-                                padding: 12px;
-                                border: 2px solid #e1e1e1;
-                                border-radius: 8px;
-                                font-size: 16px;
-                                margin-top: 5px;
-                                box-sizing: border-box;
-                            ">
+                            <input type="password" id="password" required style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; margin-top: 5px; box-sizing: border-box;">
                         </div>
-                        <button type="submit" style="
-                            width: 100%;
-                            padding: 12px;
-                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                            color: white;
-                            border: none;
-                            border-radius: 8px;
-                            font-size: 16px;
-                            font-weight: bold;
-                            cursor: pointer;
-                            transition: transform 0.2s;
-                        ">
+                        <button type="submit" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">
                             Ingresar
                         </button>
                     </form>
                     
-                    <div id="loginError" style="
-                        color: #e74c3c;
-                        text-align: center;
-                        margin-top: 15px;
-                        font-weight: bold;
-                    "></div>
+                    <div id="loginError" style="color: #e74c3c; text-align: center; margin-top: 15px; font-weight: bold;"></div>
                 </div>
             </div>
         `;
@@ -205,24 +136,12 @@ class GestorRecibos {
     obtenerHTMLInterfaz() {
         return `
             <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-                <div class="header" style="
-                    background: white;
-                    padding: 20px;
-                    border-radius: 10px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                    margin-bottom: 20px;
-                ">
+                <div class="header" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
                     ${this.obtenerHTMLHeader()}
                     ${this.obtenerHTMLControles()}
                 </div>
                 
-                <div id="loading" style="
-                    display: none;
-                    text-align: center;
-                    padding: 40px;
-                    font-size: 18px;
-                    color: #667eea;
-                ">
+                <div id="loading" style="display: none; text-align: center; padding: 40px; font-size: 18px; color: #667eea;">
                     ⏳ Cargando recibos...
                 </div>
                 
@@ -233,68 +152,36 @@ class GestorRecibos {
 
     obtenerHTMLHeader() {
         return `
-            <div class="user-info" style="
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 15px 20px;
-                border-radius: 8px;
-                margin-bottom: 20px;
-            ">
+            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
                 <div>
                     <strong>👤 ${this.usuarioActual.username}</strong>
                     <br>
                     <small>${this.usuarioActual.dependencia || 'Super Administrador'}</small>
                 </div>
-                <button onclick="gestorRecibos.cerrarSesion()" style="
-                    background-color: rgba(255,255,255,0.2);
-                    color: white;
-                    border: 1px solid rgba(255,255,255,0.3);
-                    padding: 8px 15px;
-                    border-radius: 5px;
-                    cursor: pointer;
-                ">
+                <button onclick="gestorRecibos.cerrarSesion()" style="background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 5px; cursor: pointer;">
                     🚪 Cerrar Sesión
                 </button>
             </div>
             
-            <h1 style="text-align: center; color: #333; margin-bottom: 20px;">
-                📋 Sistema de Gestión de Recibos
-            </h1>
+            <h1 style="text-align: center; color: #333; margin-bottom: 20px;">📋 Sistema de Gestión de Recibos</h1>
         `;
     }
 
     obtenerHTMLControles() {
         return `
-            <div class="controls" style="
-                display: flex;
-                gap: 15px;
-                align-items: center;
-                justify-content: center;
-            ">
-                <select id="dependenciaSelect" style="
-                    padding: 10px;
-                    border: 2px solid #e1e1e1;
-                    border-radius: 5px;
-                    font-size: 16px;
-                    min-width: 200px;
-                ">
+            <div class="controls" style="display: flex; gap: 15px; align-items: center; justify-content: center; flex-wrap: wrap;">
+                <select id="dependenciaSelect" style="padding: 10px; border: 2px solid #e1e1e1; border-radius: 5px; font-size: 16px; min-width: 200px;">
                     <option value="">Selecciona una dependencia</option>
                 </select>
                 
-                <button id="loadBtn" style="
-                    padding: 10px 20px;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                    border: none;
-                    border-radius: 5px;
-                    font-size: 16px;
-                    cursor: pointer;
-                    font-weight: bold;
-                ">
+                <input type="text" id="legajoInput" placeholder="Filtrar por legajo..." style="padding: 10px; border: 2px solid #e1e1e1; border-radius: 5px; font-size: 16px; min-width: 150px;">
+                
+                <button id="loadBtn" style="padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;">
                     📥 Cargar Recibos
+                </button>
+                
+                <button id="clearBtn" style="padding: 10px 15px; background: #6c757d; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+                    🗑️ Limpiar
                 </button>
             </div>
         `;
@@ -305,10 +192,13 @@ class GestorRecibos {
         this.botonCargar = document.getElementById('loadBtn');
         this.cargando = document.getElementById('loading');
         this.contenedorRecibos = document.getElementById('recibosContainer');
+        this.inputLegajo = document.getElementById('legajoInput');
     }
 
     configurarEventos() {
         this.botonCargar.addEventListener('click', () => this.cargarRecibos());
+        this.inputLegajo.addEventListener('input', () => this.filtrarPorLegajo());
+        document.getElementById('clearBtn').addEventListener('click', () => this.limpiarFiltros());
     }
 
     async cargarDependenciasRestringidas() {
@@ -370,11 +260,6 @@ class GestorRecibos {
             return;
         }
 
-        if (!this.verificarPermisos(dependenciaSeleccionada)) {
-            alert('❌ No tienes permisos para acceder a esta dependencia');
-            return;
-        }
-
         this.mostrarCarga(true);
         this.contenedorRecibos.innerHTML = '';
 
@@ -389,13 +274,14 @@ class GestorRecibos {
             const encabezados = datos.values[0];
             const filas = datos.values.slice(2);
 
-            this.recibosFiltrados = filas.filter(fila => fila[4] === dependenciaSeleccionada);
+            this.todosLosRecibos = filas.filter(fila => fila[4] === dependenciaSeleccionada);
 
-            if (this.recibosFiltrados.length === 0) {
+            if (this.todosLosRecibos.length === 0) {
                 this.mostrarError('No se encontraron recibos para esta dependencia');
                 return;
             }
 
+            this.aplicarFiltros();
             this.renderizarRecibos(this.recibosFiltrados, encabezados);
 
         } catch (error) {
@@ -406,9 +292,52 @@ class GestorRecibos {
         }
     }
 
-    verificarPermisos(dependenciaSeleccionada) {
-        return this.usuarioActual.role === 'superadmin' || 
-               dependenciaSeleccionada === this.usuarioActual.dependencia;
+    verificarPermisos(dependencia) {
+        if (this.usuarioActual.role === 'superadmin') {
+            return true;
+        }
+        return this.usuarioActual.dependencia === dependencia;
+    }
+
+    aplicarFiltros() {
+        let recibos = [...this.todosLosRecibos];
+        
+        const legajoBuscado = this.inputLegajo.value.trim();
+        if (legajoBuscado) {
+            recibos = recibos.filter(recibo => {
+                const legajoRecibo = recibo[1] ? recibo[1].toString() : '';
+                return legajoRecibo.toLowerCase().includes(legajoBuscado.toLowerCase());
+            });
+        }
+        
+        this.recibosFiltrados = recibos;
+    }
+
+    filtrarPorLegajo() {
+        if (this.todosLosRecibos.length === 0) {
+            return;
+        }
+
+        this.aplicarFiltros();
+        this.contenedorRecibos.innerHTML = '';
+        
+        if (this.recibosFiltrados.length === 0) {
+            this.mostrarError('No se encontraron recibos con ese número de legajo');
+        } else {
+            const encabezados = ['Legajo', 'Nombre', 'Monto', 'PDF', 'Dependencia'];
+            this.renderizarRecibos(this.recibosFiltrados, encabezados);
+        }
+    }
+
+    limpiarFiltros() {
+        this.inputLegajo.value = '';
+        
+        if (this.todosLosRecibos.length > 0) {
+            this.recibosFiltrados = [...this.todosLosRecibos];
+            const encabezados = ['Legajo', 'Nombre', 'Monto', 'PDF', 'Dependencia'];
+            this.contenedorRecibos.innerHTML = '';
+            this.renderizarRecibos(this.recibosFiltrados, encabezados);
+        }
     }
 
     renderizarRecibos(recibos, encabezados) {
@@ -437,27 +366,13 @@ class GestorRecibos {
     }
 
     obtenerHTMLTarjeta(recibo, encabezados, indice) {
+        const legajo = recibo[1] || 'N/A';
         return `
-            <div class="recibo-header" style="
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 15px 20px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            ">
+            <div class="recibo-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
                 <div style="font-size: 18px; font-weight: bold;">
-                    📄 Recibo #${indice + 1}
+                    📄 Recibo #${indice + 1} - Legajo: ${legajo}
                 </div>
-                <button onclick="gestorRecibos.descargarRecibo(${indice})" style="
-                    background-color: rgba(255,255,255,0.2);
-                    color: white;
-                    border: 1px solid rgba(255,255,255,0.3);
-                    padding: 8px 12px;
-                    border-radius: 5px;
-                    cursor: pointer;
-                    font-size: 14px;
-                ">
+                <button onclick="gestorRecibos.descargarRecibo(${indice})" style="background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 14px;">
                     📥 Descargar PDF
                 </button>
             </div>
@@ -470,20 +385,11 @@ class GestorRecibos {
     obtenerHTMLDetalles(recibo, encabezados) {
         return encabezados
             .map((encabezado, i) => {
-                if (i === 3) return ''; // Saltar columna de PDF
+                if (i === 3) return '';
                 return `
-                    <div style="
-                        display: flex;
-                        justify-content: space-between;
-                        padding: 10px 0;
-                        border-bottom: 1px solid #f0f0f0;
-                    ">
-                        <div style="font-weight: bold; color: #555; flex: 1;">
-                            ${encabezado}:
-                        </div>
-                        <div style="color: #333; flex: 2; text-align: right;">
-                            ${recibo[i] || 'N/A'}
-                        </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
+                        <div style="font-weight: bold; color: #555; flex: 1;">${encabezado}:</div>
+                        <div style="color: #333; flex: 2; text-align: right;">${recibo[i] || 'N/A'}</div>
                     </div>
                 `;
             })
@@ -524,15 +430,7 @@ class GestorRecibos {
 
     mostrarError(mensaje) {
         this.contenedorRecibos.innerHTML = `
-            <div style="
-                text-align: center;
-                color: #e74c3c;
-                font-size: 18px;
-                padding: 40px;
-                background: white;
-                border-radius: 10px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            ">
+            <div style="text-align: center; color: #e74c3c; font-size: 18px; padding: 40px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
                 ❌ ${mensaje}
             </div>
         `;
