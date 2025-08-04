@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador de Recibos por Dependencia</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Recibos por Dependencia</h1>
+        </header>
+        
+        <div class="controls">
+            <select id="dependenciaSelect">
+                <option value="">Seleccionar Dependencia</option>
+            </select>
+            <button id="loadBtn">Cargar Recibos</button>
+        </div>
+        
+        <div class="loading" id="loading" style="display: none;">
+            Cargando recibos...
+        </div>
+        
+        <div class="recibos-container" id="recibosContainer">
+            
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
