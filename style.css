@@ -1,3 +1,39 @@
+/* --- Barra de herramientas de descargas --- */
+.toolbar-downloads {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 4px 18px rgba(44,62,80,0.13);
+    padding: 18px 0 12px 0;
+    margin-bottom: 28px;
+    border-radius: 0 0 18px 18px;
+    border-bottom: 3px solid #fff;
+    position: relative;
+    z-index: 10;
+}
+.toolbar-downloads .download-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 28px;
+    background: rgba(255,255,255,0.13);
+    color: #fff;
+    border-radius: 9px;
+    font-size: 17px;
+    font-weight: 600;
+    text-decoration: none;
+    margin: 0 10px 10px 10px;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.13);
+    border: 1.5px solid rgba(255,255,255,0.18);
+    letter-spacing: 0.02em;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    backdrop-filter: blur(1.5px);
+}
+.toolbar-downloads .download-link:hover {
+    background: rgba(255,255,255,0.22);
+    color: #222;
+    transform: translateY(-3px) scale(1.06);
+    box-shadow: 0 4px 16px rgba(44,62,80,0.18);
+    border-color: #fff;
+}
 * {
     margin: 0;
     padding: 0;

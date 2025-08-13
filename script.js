@@ -6,10 +6,12 @@ class GestorRecibos {
         this.HOJA_VACACIONES = 'Vacaciones';
         this.HOJA_BAJAS = 'Bajas Sin Cubrir';
         this.HOJA_PersonalActivo = 'Personal Activo';
+        this.HOJA_ACCIDENTES = 'Accidentes';
+        this.HOJA_MedicinaLaboral = 'Medicina Laboral';
 
         this.usuarios = {};
         this.usuarioActual = null;
-        
+
         // Variables para recibos
         this.recibosFiltrados = [];
         this.todosLosRecibos = [];
@@ -46,6 +48,37 @@ class GestorRecibos {
         this.contenedorPersonalActivo = null;
         this.inputLegajoPersonalActivo = null;
 
+        // Variables para accidentes
+        this.formularioAccidente = null;
+        this.inputLegajoAccidente = null;
+        this.inputNombreAccidente = null;
+        this.inputApellidoAccidente = null;
+        this.inputDetalleAccidente = null;
+        this.inputFechaAccidente = null;
+        this.inputHoraAccidente = null;
+        this.inputAdministradorAccidente = null;
+        this.botonGuardarAccidente = null;
+
+        // Variables para medicina laboral
+        this.formularioMedicinaLaboral = null;
+        this.inputLegajoMedicinaLaboral = null;
+        this.inputNombreMedicinaLaboral = null;
+        this.inputApellidoMedicinaLaboral = null;
+        this.inputFechaCertificadoMedicinaLaboral = null;
+        this.inputcantDiasHorasMedicinaLaboral = null;
+        this.inputHoraMedicinaLaboral = null;
+        this.diagnosticoMedicinaLaboral = null;
+        this.archivoAdjMedicinaLaboral = null;
+        this.inputAdministradorMedicinaLaboral = null;
+
+
+        this.pdfLinks = [
+            { href: 'pdfs/IOMA.pdf', label: 'IOMA', icon: '📄' },
+            { href: 'pdfs/modelo_nota.pdf', label: 'Modelo de Nota', icon: '📝' },
+            { href: 'pdfs/ordenanzas.pdf', label: 'Ordenanzas', icon: '📚' },
+            { href: 'pdfs/normativa_medicina_laboral.pdf', label: 'Normativa Medicina Laboral', icon: '⚖️' },
+        ];
+
         this.inicializar();
     }
 
@@ -73,7 +106,7 @@ class GestorRecibos {
         try {
             const datos = await this.obtenerDatosHoja(`${this.HOJA_USUARIOS}!A:D`);
             this.usuarios = {};
-            
+
             if (datos.values?.length > 1) {
                 datos.values.slice(1).forEach(fila => {
                     if (fila[0] && fila[1] && fila[2]) {
@@ -99,11 +132,11 @@ class GestorRecibos {
 
     obtenerHTMLLogin() {
         return `
+            ${this.getToolbarDownloadsHTML()}
             <div class="login-container" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: Arial, sans-serif;">
                 <div class="login-form" style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 350px; text-align: center;">
-                    <h2 style="color: #333; margin-bottom: 30px; font-size: 28px;">Sistema de Recibos</h2>
+                    <h2 style="color: #333; margin-bottom: 30px; font-size: 28px;">Sistema de Gestión</h2>
                     <p style="color: #666; margin-bottom: 25px;">Inicia sesión para acceder</p>
-                    
                     <form id="loginForm">
                         <div style="margin-bottom: 20px; text-align: left;">
                             <label style="color: #555; font-weight: bold;">Usuario:</label>
@@ -117,10 +150,20 @@ class GestorRecibos {
                             Ingresar
                         </button>
                     </form>
-                    
                     <div id="loginError" style="color: #e74c3c; text-align: center; margin-top: 15px; font-weight: bold;"></div>
                 </div>
             </div>
+        `;
+    }
+
+    getToolbarDownloadsHTML() {
+        const links = this.pdfLinks
+            .map(l => `<a href="${l.href}" download class="download-link">${l.icon} ${l.label}</a>`)
+            .join('');
+        return `
+            <nav class="toolbar-downloads">
+                <div style="display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;">${links}</div>
+            </nav>
         `;
     }
 
@@ -136,12 +179,12 @@ class GestorRecibos {
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value;
         const errorDiv = document.getElementById('loginError');
-        
+
         errorDiv.textContent = 'Verificando credenciales...';
         errorDiv.style.color = '#007bff';
-        
+
         await this.cargarUsuarios();
-        
+
         if (this.usuarios[username]?.password === password) {
             this.usuarioActual = { username, ...this.usuarios[username] };
             this.mostrarInterfazPrincipal();
@@ -189,6 +232,14 @@ class GestorRecibos {
                         
                         <button onclick="gestorRecibos.mostrarModuloPersonalActivo()" class="menu-btn" style="padding: 30px 20px; background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%); color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
                             👥<br>Personal Activo
+                        </button>
+                        
+                        <button onclick="gestorRecibos.mostrarModuloAccidentes()" class="menu-btn" style="padding: 30px 20px; background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%); color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+                            🚨<br>Registrar Accidente
+                        </button>
+
+                        <button onclick="gestorRecibos.mostrarModuloMedicinaLaboral()" class="menu-btn" style="padding: 30px 20px; background: linear-gradient(135deg, #1427fdff 0%, #e83e8c 100%); color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+                            🏥<br>Medicina Laboral
                         </button>
                     </div>
                 </div>
@@ -315,9 +366,14 @@ class GestorRecibos {
     }
 
     async cargarTodasLasDependencias() {
+        const opcionTodos = document.createElement('option');
+        opcionTodos.value = 'TODOS';
+        opcionTodos.textContent = 'Ver Todas las Dependencias';
+        this.selectorDependencia.appendChild(opcionTodos);
+
         const datos = await this.obtenerDatosHoja('E:E');
         const dependencias = [...new Set(datos.values.slice(2).map(fila => fila[0]).filter(dep => dep))];
-        
+
         dependencias.forEach(dep => {
             const opcion = document.createElement('option');
             opcion.value = dep;
@@ -374,7 +430,12 @@ class GestorRecibos {
             const encabezados = datos.values[0];
             const filas = datos.values.slice(2);
 
-            this.todosLosRecibos = filas.filter(fila => fila[4] === dependenciaSeleccionada);
+            // Si es superadmin y selecciona "TODOS", mostrar todos los recibos
+            if (this.usuarioActual.role === 'superadmin' && dependenciaSeleccionada === 'TODOS') {
+                this.todosLosRecibos = filas;
+            } else {
+                this.todosLosRecibos = filas.filter(fila => fila[4] === dependenciaSeleccionada);
+            }
 
             if (this.todosLosRecibos.length === 0) {
                 this.mostrarError('No se encontraron recibos para esta dependencia');
@@ -401,7 +462,7 @@ class GestorRecibos {
 
     aplicarFiltros() {
         let recibos = [...this.todosLosRecibos];
-        
+
         const legajoBuscado = this.inputLegajo.value.trim();
         if (legajoBuscado) {
             recibos = recibos.filter(recibo => {
@@ -409,7 +470,7 @@ class GestorRecibos {
                 return legajoRecibo.toLowerCase().includes(legajoBuscado.toLowerCase());
             });
         }
-        
+
         this.recibosFiltrados = recibos;
     }
 
@@ -420,7 +481,7 @@ class GestorRecibos {
 
         this.aplicarFiltros();
         this.contenedorRecibos.innerHTML = '';
-        
+
         if (this.recibosFiltrados.length === 0) {
             this.mostrarError('No se encontraron recibos con ese número de legajo');
         } else {
@@ -431,7 +492,7 @@ class GestorRecibos {
 
     limpiarFiltros() {
         this.inputLegajo.value = '';
-        
+
         if (this.todosLosRecibos.length > 0) {
             this.recibosFiltrados = [...this.todosLosRecibos];
             const encabezados = ['Legajo', 'Nombre', 'Monto', 'PDF', 'Dependencia'];
@@ -458,10 +519,10 @@ class GestorRecibos {
             overflow: hidden;
             transition: transform 0.2s;
         `;
-        
+
         tarjeta.innerHTML = this.obtenerHTMLTarjeta(recibo, encabezados, indice);
         this.configurarHoverTarjeta(tarjeta);
-        
+
         return tarjeta;
     }
 
@@ -518,7 +579,7 @@ class GestorRecibos {
         enlace.href = url;
         enlace.download = nombreArchivo;
         enlace.target = '_blank';
-        
+
         document.body.appendChild(enlace);
         enlace.click();
         document.body.removeChild(enlace);
@@ -632,9 +693,15 @@ class GestorRecibos {
     }
 
     async cargarTodasLasDependenciasVacaciones() {
+        // Agregar opción para ver todos los datos
+        const opcionTodos = document.createElement('option');
+        opcionTodos.value = 'TODOS';
+        opcionTodos.textContent = 'Ver Todas las Dependencias';
+        this.selectorDependenciaVacaciones.appendChild(opcionTodos);
+
         const datos = await this.obtenerDatosHoja(`${this.HOJA_VACACIONES}!C:C`);
         const dependencias = [...new Set(datos.values?.slice(1).map(fila => fila[0]).filter(dep => dep) || [])];
-        
+
         dependencias.forEach(dep => {
             const opcion = document.createElement('option');
             opcion.value = dep;
@@ -675,7 +742,12 @@ class GestorRecibos {
             const encabezados = datos.values[0];
             const filas = datos.values.slice(1);
 
-            this.todasLasVacaciones = filas.filter(fila => fila[2] === dependenciaSeleccionada);
+            // Si es superadmin y selecciona "TODOS", mostrar todas las vacaciones
+            if (this.usuarioActual.role === 'superadmin' && dependenciaSeleccionada === 'TODOS') {
+                this.todasLasVacaciones = filas;
+            } else {
+                this.todasLasVacaciones = filas.filter(fila => fila[2] === dependenciaSeleccionada);
+            }
 
             if (this.todasLasVacaciones.length === 0) {
                 this.mostrarErrorVacaciones('No se encontraron vacaciones para esta dependencia');
@@ -695,7 +767,7 @@ class GestorRecibos {
 
     aplicarFiltrosVacaciones() {
         let vacaciones = [...this.todasLasVacaciones];
-        
+
         const legajoBuscado = this.inputLegajoVacaciones.value.trim();
         if (legajoBuscado) {
             vacaciones = vacaciones.filter(vacacion => {
@@ -703,7 +775,7 @@ class GestorRecibos {
                 return legajoVacacion.toLowerCase().includes(legajoBuscado.toLowerCase());
             });
         }
-        
+
         this.vacacionesFiltradas = vacaciones;
     }
 
@@ -714,7 +786,7 @@ class GestorRecibos {
 
         this.aplicarFiltrosVacaciones();
         this.contenedorVacaciones.innerHTML = '';
-        
+
         if (this.vacacionesFiltradas.length === 0) {
             this.mostrarErrorVacaciones('No se encontraron vacaciones con ese número de legajo');
         } else {
@@ -725,7 +797,7 @@ class GestorRecibos {
 
     limpiarFiltrosVacaciones() {
         this.inputLegajoVacaciones.value = '';
-        
+
         if (this.todasLasVacaciones && this.todasLasVacaciones.length > 0) {
             this.vacacionesFiltradas = [...this.todasLasVacaciones];
             const encabezados = ['Legajo', 'Nombre', 'Fecha Inicio', 'Fecha Fin', 'Dependencia'];
@@ -752,10 +824,10 @@ class GestorRecibos {
             overflow: hidden;
             transition: transform 0.2s;
         `;
-        
+
         tarjeta.innerHTML = this.obtenerHTMLTarjetaVacacion(vacacion, encabezados, indice);
         this.configurarHoverTarjeta(tarjeta);
-        
+
         return tarjeta;
     }
 
@@ -895,9 +967,15 @@ class GestorRecibos {
     }
 
     async cargarTodasLasDependenciasBajas() {
+        // Agregar opción para ver todos los datos
+        const opcionTodos = document.createElement('option');
+        opcionTodos.value = 'TODOS';
+        opcionTodos.textContent = 'Ver Todas las Dependencias';
+        this.selectorDependenciaBajas.appendChild(opcionTodos);
+
         const datos = await this.obtenerDatosHoja(`${this.HOJA_BAJAS}!F:F`);
         const dependencias = [...new Set(datos.values?.slice(1).map(fila => fila[0]).filter(dep => dep) || [])];
-        
+
         dependencias.forEach(dep => {
             const opcion = document.createElement('option');
             opcion.value = dep;
@@ -938,7 +1016,12 @@ class GestorRecibos {
             const encabezados = datos.values[0];
             const filas = datos.values.slice(1);
 
-            this.todasLasBajas = filas.filter(fila => fila[5] === dependenciaSeleccionada);
+            // Si es superadmin y selecciona "TODOS", mostrar todas las bajas
+            if (this.usuarioActual.role === 'superadmin' && dependenciaSeleccionada === 'TODOS') {
+                this.todasLasBajas = filas;
+            } else {
+                this.todasLasBajas = filas.filter(fila => fila[5] === dependenciaSeleccionada);
+            }
 
             if (this.todasLasBajas.length === 0) {
                 this.mostrarErrorBajas('No se encontraron bajas sin cubrir para esta dependencia');
@@ -958,7 +1041,7 @@ class GestorRecibos {
 
     aplicarFiltrosBajas() {
         let bajas = [...this.todasLasBajas];
-        
+
         const legajoBuscado = this.inputLegajoBajas.value.trim();
         if (legajoBuscado) {
             bajas = bajas.filter(baja => {
@@ -966,7 +1049,7 @@ class GestorRecibos {
                 return legajoBaja.toLowerCase().includes(legajoBuscado.toLowerCase());
             });
         }
-        
+
         this.bajasFiltradas = bajas;
     }
 
@@ -977,7 +1060,7 @@ class GestorRecibos {
 
         this.aplicarFiltrosBajas();
         this.contenedorBajas.innerHTML = '';
-        
+
         if (this.bajasFiltradas.length === 0) {
             this.mostrarErrorBajas('No se encontraron bajas sin cubrir con ese número de legajo');
         } else {
@@ -988,7 +1071,7 @@ class GestorRecibos {
 
     limpiarFiltrosBajas() {
         this.inputLegajoBajas.value = '';
-        
+
         if (this.todasLasBajas && this.todasLasBajas.length > 0) {
             this.bajasFiltradas = [...this.todasLasBajas];
             const encabezados = ['Legajo', 'Nombre', 'Fecha Inicio', 'Fecha Fin', 'Dependencia'];
@@ -1015,10 +1098,10 @@ class GestorRecibos {
             overflow: hidden;
             transition: transform 0.2s;
         `;
-        
+
         tarjeta.innerHTML = this.obtenerHTMLTarjetaBaja(baja, encabezados, indice);
         this.configurarHoverTarjeta(tarjeta);
-        
+
         return tarjeta;
     }
 
@@ -1061,7 +1144,7 @@ class GestorRecibos {
             </div>
         `;
     }
-    
+
     // MÓDULO DE PERSONAL ACTIVO
     mostrarModuloPersonalActivo() {
         document.body.innerHTML = this.obtenerHTMLPersonalActivo();
@@ -1158,9 +1241,14 @@ class GestorRecibos {
     }
 
     async cargarTodasLasDependenciasPersonalActivo() {
+        const opcionTodos = document.createElement('option');
+        opcionTodos.value = 'TODOS';
+        opcionTodos.textContent = 'Ver Todas las Dependencias';
+        this.selectorDependenciaPersonalActivo.appendChild(opcionTodos);
+
         const datos = await this.obtenerDatosHoja(`${this.HOJA_PersonalActivo}!D:D`);
         const dependencias = [...new Set(datos.values?.slice(1).map(fila => fila[0]).filter(dep => dep) || [])];
-        
+
         dependencias.forEach(dep => {
             const opcion = document.createElement('option');
             opcion.value = dep;
@@ -1201,7 +1289,12 @@ class GestorRecibos {
             const encabezados = datos.values[0];
             const filas = datos.values.slice(1);
 
-            this.todosLosPersonalActivo = filas.filter(fila => fila[3] === dependenciaSeleccionada);
+            // Si es superadmin y selecciona "TODOS", mostrar todo el personal
+            if (this.usuarioActual.role === 'superadmin' && dependenciaSeleccionada === 'TODOS') {
+                this.todosLosPersonalActivo = filas;
+            } else {
+                this.todosLosPersonalActivo = filas.filter(fila => fila[3] === dependenciaSeleccionada);
+            }
 
             if (this.todosLosPersonalActivo.length === 0) {
                 this.mostrarErrorPersonalActivo('No se encontró personal activo para esta dependencia');
@@ -1221,7 +1314,7 @@ class GestorRecibos {
 
     aplicarFiltrosPersonalActivo() {
         let personal = [...this.todosLosPersonalActivo];
-        
+
         const legajoBuscado = this.inputLegajoPersonalActivo.value.trim();
         if (legajoBuscado) {
             personal = personal.filter(persona => {
@@ -1229,7 +1322,7 @@ class GestorRecibos {
                 return legajoPersona.toLowerCase().includes(legajoBuscado.toLowerCase());
             });
         }
-        
+
         this.personalActivoFiltrado = personal;
     }
 
@@ -1240,7 +1333,7 @@ class GestorRecibos {
 
         this.aplicarFiltrosPersonalActivo();
         this.contenedorPersonalActivo.innerHTML = '';
-        
+
         if (this.personalActivoFiltrado.length === 0) {
             this.mostrarErrorPersonalActivo('No se encontró personal activo con ese número de legajo');
         } else {
@@ -1251,7 +1344,7 @@ class GestorRecibos {
 
     limpiarFiltrosPersonalActivo() {
         this.inputLegajoPersonalActivo.value = '';
-        
+
         if (this.todosLosPersonalActivo && this.todosLosPersonalActivo.length > 0) {
             this.personalActivoFiltrado = [...this.todosLosPersonalActivo];
             const encabezados = ['Legajo', 'Nombre', 'Cargo', 'Estado', 'Dependencia'];
@@ -1278,10 +1371,10 @@ class GestorRecibos {
             overflow: hidden;
             transition: transform 0.2s;
         `;
-        
+
         tarjeta.innerHTML = this.obtenerHTMLTarjetaPersonalActivo(persona, encabezados, indice);
         this.configurarHoverTarjeta(tarjeta);
-        
+
         return tarjeta;
     }
 
@@ -1290,15 +1383,14 @@ class GestorRecibos {
         const nombre = persona[1] || 'N/A';
         const cargo = persona[2] || 'N/A';
         const estado = persona[3] || 'N/A';
-        
-        // Color del estado basado en el valor
+
         let estadoColor = '#28a745'; // Verde por defecto (activo)
         if (estado.toLowerCase().includes('inactivo') || estado.toLowerCase().includes('baja')) {
             estadoColor = '#dc3545'; // Rojo
         } else if (estado.toLowerCase().includes('licencia') || estado.toLowerCase().includes('suspendido')) {
             estadoColor = '#ffc107'; // Amarillo
         }
-        
+
         return `
             <div class="personal-activo-header" style="background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
                 <div style="font-size: 18px; font-weight: bold;">
@@ -1318,8 +1410,6 @@ class GestorRecibos {
         return encabezados
             .map((encabezado, i) => {
                 let valor = persona[i] || 'N/A';
-                
-                // Formatear el estado con color
                 if (encabezado === 'Estado' && valor !== 'N/A') {
                     let estadoColor = '#28a745';
                     if (valor.toLowerCase().includes('inactivo') || valor.toLowerCase().includes('baja')) {
@@ -1329,7 +1419,7 @@ class GestorRecibos {
                     }
                     valor = `<span style="color: ${estadoColor}; font-weight: bold;">${valor}</span>`;
                 }
-                
+
                 return `
                     <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
                         <div style="font-weight: bold; color: #555; flex: 1;">${encabezado}:</div>
@@ -1350,6 +1440,771 @@ class GestorRecibos {
                 ❌ ${mensaje}
             </div>
         `;
+    }
+
+    // MÓDULO DE ACCIDENTES
+    mostrarModuloAccidentes() {
+        document.body.innerHTML = this.obtenerHTMLAccidentes();
+        this.inicializarReferenciasDOMAccidentes();
+        this.configurarEventosAccidentes();
+        this.establecerFechaHoraActual();
+    }
+
+    obtenerHTMLAccidentes() {
+        return `
+            <div class="container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+                <div class="header" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                    ${this.obtenerHTMLHeaderAccidentes()}
+                    
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                            ⬅️ Volver al Menú Principal
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-container" style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    ${this.obtenerHTMLFormularioAccidente()}
+                </div>
+                
+                <div id="mensajeAccidente" style="margin-top: 20px; padding: 15px; border-radius: 8px; display: none; font-weight: bold; text-align: center;"></div>
+            </div>
+        `;
+    }
+
+    obtenerHTMLHeaderAccidentes() {
+        return `
+            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
+                <div>
+                    <strong>👤 ${this.usuarioActual.username}</strong>
+                    <br>
+                    <small>${this.usuarioActual.dependencia || 'Super Administrador'}</small>
+                </div>
+                <button onclick="gestorRecibos.cerrarSesion()" style="background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 5px; cursor: pointer;">
+                    🚪 Cerrar Sesión
+                </button>
+            </div>
+            
+            <h1 style="text-align: center; color: #333; margin-bottom: 20px;">🚨 Registro de Accidentes Laborales</h1>
+        `;
+    }
+
+    obtenerHTMLFormularioAccidente() {
+        return `
+            <form id="formularioAccidente">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
+                            <span style="color: #e74c3c;">*</span> Número de Legajo:
+                        </label>
+                        <input type="text" id="legajoAccidente" required 
+                               style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                               placeholder="Ej: 12345">
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
+                            <span style="color: #e74c3c;">*</span> Nombre del Accidentado:
+                        </label>
+                        <input type="text" id="nombreAccidente" required 
+                               style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                               placeholder="Ej: Juan Carlos">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
+                        <span style="color: #e74c3c;">*</span> Apellido del Accidentado:
+                    </label>
+                    <input type="text" id="apellidoAccidente" required 
+                           style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                           placeholder="Ej: González Pérez">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
+                        <span style="color: #e74c3c;">*</span> Detalle del Accidente:
+                    </label>
+                    <textarea id="detalleAccidente" required rows="4"
+                              style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; resize: vertical; box-sizing: border-box;"
+                              placeholder="Describa lo sucedido..."></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
+                            <span style="color: #e74c3c;">*</span> Fecha del Accidente:
+                        </label>
+                        <input type="date" id="fechaAccidente" required 
+                               style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
+                            <span style="color: #e74c3c;">*</span> Hora del Accidente:
+                        </label>
+                        <input type="time" id="horaAccidente" required 
+                               style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
+                        <span style="color: #e74c3c;">*</span> Administrador que Carga el Reclamo:
+                    </label>
+                    <input type="text" id="administradorAccidente" required
+                           style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                           placeholder="Ingrese nombre y apellido del administrador...">
+                </div>
+
+                <div style="text-align: center;">
+                    <button type="submit" id="guardarAccidente" 
+                            style="padding: 15px 30px; background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%); color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s;">
+                        🚨 Registrar Accidente
+                    </button>
+                </div>
+
+                <div style="margin-top: 20px; padding: 15px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; color: #856404;">
+                    <strong>📝 Nota importante:</strong> Los campos marcados con <span style="color: #e74c3c;">*</span> son obligatorios. 
+                    Asegúrese de completar toda la información requerida antes de enviar el formulario.
+                </div>
+            </form>
+        `;
+    }
+
+    inicializarReferenciasDOMAccidentes() {
+        this.formularioAccidente = document.getElementById('formularioAccidente');
+        this.inputLegajoAccidente = document.getElementById('legajoAccidente');
+        this.inputNombreAccidente = document.getElementById('nombreAccidente');
+        this.inputApellidoAccidente = document.getElementById('apellidoAccidente');
+        this.inputDetalleAccidente = document.getElementById('detalleAccidente');
+        this.inputFechaAccidente = document.getElementById('fechaAccidente');
+        this.inputHoraAccidente = document.getElementById('horaAccidente');
+        this.inputAdministradorAccidente = document.getElementById('administradorAccidente');
+        this.botonGuardarAccidente = document.getElementById('guardarAccidente');
+    }
+
+    configurarEventosAccidentes() {
+        this.formularioAccidente.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.guardarAccidente();
+        });
+
+        // Agregar efecto hover al botón
+        this.botonGuardarAccidente.onmouseover = () => {
+            this.botonGuardarAccidente.style.transform = 'translateY(-2px)';
+            this.botonGuardarAccidente.style.boxShadow = '0 5px 15px rgba(253, 126, 20, 0.4)';
+        };
+
+        this.botonGuardarAccidente.onmouseout = () => {
+            this.botonGuardarAccidente.style.transform = 'translateY(0)';
+            this.botonGuardarAccidente.style.boxShadow = 'none';
+        };
+    }
+
+    establecerFechaHoraActual() {
+        const ahora = new Date();
+        const fecha = ahora.toISOString().split('T')[0];
+        const hora = ahora.toTimeString().split(':').slice(0, 2).join(':');
+
+        this.inputFechaAccidente.value = fecha;
+        this.inputHoraAccidente.value = hora;
+    }
+
+    async guardarAccidente() {
+        if (!this.validarFormularioAccidente()) {
+            return;
+        }
+
+        this.botonGuardarAccidente.disabled = true;
+        this.botonGuardarAccidente.textContent = '⏳ Guardando...';
+        this.botonGuardarAccidente.style.background = '#6c757d';
+
+        try {
+            const datosAccidente = this.recopilarDatosAccidente();
+            await this.enviarAccidenteAHoja(datosAccidente);
+            this.mostrarMensajeExito();
+            this.limpiarFormularioAccidente();
+        } catch (error) {
+            console.error('Error guardando accidente:', error);
+            this.mostrarMensajeError('Error al guardar el accidente. Intente nuevamente.');
+        } finally {
+            this.restaurarBotonGuardar();
+        }
+    }
+
+    validarFormularioAccidente() {
+        const campos = [
+            { elemento: this.inputLegajoAccidente, nombre: 'Número de Legajo' },
+            { elemento: this.inputNombreAccidente, nombre: 'Nombre' },
+            { elemento: this.inputApellidoAccidente, nombre: 'Apellido' },
+            { elemento: this.inputDetalleAccidente, nombre: 'Detalle del Accidente' },
+            { elemento: this.inputFechaAccidente, nombre: 'Fecha del Accidente' },
+            { elemento: this.inputHoraAccidente, nombre: 'Hora del Accidente' },
+            { elemento: this.inputAdministradorAccidente, nombre: 'Administrador' }
+        ];
+
+        for (const campo of campos) {
+            if (!campo.elemento.value.trim()) {
+                this.mostrarMensajeError(`El campo "${campo.nombre}" es obligatorio.`);
+                campo.elemento.focus();
+                return false;
+            }
+        }
+
+        if (!/^\d+$/.test(this.inputLegajoAccidente.value.trim())) {
+            this.mostrarMensajeError('El número de legajo debe contener solo números.');
+            this.inputLegajoAccidente.focus();
+            return false;
+        }
+
+        if (this.inputDetalleAccidente.value.trim().length < 10) {
+            this.mostrarMensajeError('El detalle del accidente debe tener al menos 10 caracteres.');
+            this.inputDetalleAccidente.focus();
+            return false;
+        }
+
+        return true;
+    }
+
+    recopilarDatosAccidente() {
+        const fechaHora = `${this.inputFechaAccidente.value} ${this.inputHoraAccidente.value}`;
+        const fechaRegistro = new Date().toLocaleString('es-AR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        return [
+            this.inputLegajoAccidente.value.trim(),
+            this.inputNombreAccidente.value.trim(),
+            this.inputApellidoAccidente.value.trim(),
+            this.inputDetalleAccidente.value.trim(),
+            fechaHora,
+            this.inputAdministradorAccidente.value.trim(),
+            this.usuarioActual.dependencia || 'Sin Dependencia',
+            fechaRegistro
+        ];
+    }
+
+    async enviarAccidenteAHoja(datosAccidente) {
+        const APPS_SCRIPT_URL = `https://script.google.com/macros/s/AKfycbz0dgpx9Ywohz9PTZ4Uvdoo10I8Rrzhht-jQBA69h_bdOiIs_ApMhscFrkVGFv9ZIrs1Q/exec`;
+
+        try {
+            await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    values: datosAccidente,
+                    sheetName: this.HOJA_ACCIDENTES
+                })
+            });
+
+            console.log("Datos enviados a Apps Script exitosamente.");
+        } catch (error) {
+            console.error('Error al contactar con Google Apps Script:', error);
+            throw error;
+        }
+    }
+
+    mostrarMensajeExito() {
+        const mensaje = document.getElementById('mensajeAccidente');
+        mensaje.style.display = 'block';
+        mensaje.style.backgroundColor = '#d4edda';
+        mensaje.style.color = '#155724';
+        mensaje.style.border = '1px solid #c3e6cb';
+        mensaje.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <span style="font-size: 24px;">✅</span>
+                <div>
+                    <strong>¡Accidente registrado exitosamente!</strong><br>
+                    <small>El reporte ha sido guardado en el sistema.</small>
+                </div>
+            </div>
+        `;
+        setTimeout(() => {
+            mensaje.style.display = 'none';
+        }, 5000);
+    }
+
+    mostrarMensajeError(texto) {
+        const mensaje = document.getElementById('mensajeAccidente');
+        mensaje.style.display = 'block';
+        mensaje.style.backgroundColor = '#f8d7da';
+        mensaje.style.color = '#721c24';
+        mensaje.style.border = '1px solid #f5c6cb';
+        mensaje.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <span style="font-size: 24px;">❌</span>
+                <div>
+                    <strong>Error:</strong><br>
+                    <small>${texto}</small>
+                </div>
+            </div>
+        `;
+
+        setTimeout(() => {
+            mensaje.style.display = 'none';
+        }, 5000);
+    }
+
+    limpiarFormularioAccidente() {
+        this.inputLegajoAccidente.value = '';
+        this.inputNombreAccidente.value = '';
+        this.inputApellidoAccidente.value = '';
+        this.inputDetalleAccidente.value = '';
+        this.inputAdministradorAccidente.value = '';
+        this.establecerFechaHoraActual();
+    }
+
+    restaurarBotonGuardar() {
+        this.botonGuardarAccidente.disabled = false;
+        this.botonGuardarAccidente.textContent = '🚨 Registrar Accidente';
+        this.botonGuardarAccidente.style.background = 'linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%)';
+    }
+
+    // MÓDULO DE MEDICINA LABORAL
+    mostrarModuloMedicinaLaboral() {
+        document.body.innerHTML = this.obtenerHTMLMedicinaLaboral();
+        this.inicializarReferenciasDOMMedicinaLaboral();
+        this.configurarEventosMedicinaLaboral();
+        this.establecerFechaActualMedicinaLaboral();
+    }
+
+    obtenerHTMLMedicinaLaboral() {
+        return `
+            <div class="container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+                <div class="header" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                    ${this.obtenerHTMLHeaderMedicinaLaboral()}
+                    
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                            ⬅️ Volver al Menú Principal
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-container" style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    ${this.obtenerHTMLFormularioMedicinaLaboral()}
+                </div>
+                
+                <div id="mensajeMedicinaLaboral" style="margin-top: 20px; padding: 15px; border-radius: 8px; display: none; font-weight: bold; text-align: center;"></div>
+            </div>
+        `;
+    }
+
+    obtenerHTMLHeaderMedicinaLaboral() {
+        return `
+            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #1427fdff 0%, #e83e8c 100%); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
+                <div>
+                    <strong>👤 ${this.usuarioActual.username}</strong>
+                    <br>
+                    <small>${this.usuarioActual.dependencia || 'Super Administrador'}</small>
+                </div>
+                <button onclick="gestorRecibos.cerrarSesion()" style="background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 5px; cursor: pointer;">
+                    🚪 Cerrar Sesión
+                </button>
+            </div>
+            
+            <h1 style="text-align: center; color: #333; margin-bottom: 20px;">🏥 Registro de Medicina Laboral</h1>
+        `;
+    }
+
+    obtenerHTMLFormularioMedicinaLaboral() {
+        return `
+            <form id="formularioMedicinaLaboral">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
+                            <span style="color: #e74c3c;">*</span> Número de Legajo:
+                        </label>
+                        <input type="text" id="legajoMedicinaLaboral" required 
+                               style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                               placeholder="Ej: 12345">
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
+                            <span style="color: #e74c3c;">*</span> Nombre:
+                        </label>
+                        <input type="text" id="nombreMedicinaLaboral" required 
+                               style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                               placeholder="Ej: Juan Carlos">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
+                        <span style="color: #e74c3c;">*</span> Apellido:
+                    </label>
+                    <input type="text" id="apellidoMedicinaLaboral" required 
+                           style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                           placeholder="Ej: González Pérez">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
+                        <span style="color: #e74c3c;">*</span> Fecha del Certificado Médico:
+                    </label>
+                    <input type="date" id="fechaCertificadoMedicinaLaboral" required 
+                           style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; color: #555; font-weight: bold; margin-bottom: 8px;">
+                        <span style="color: #e74c3c;">*</span> Tipo de Registro:
+                    </label>
+                    <div style="display:flex; gap:16px; align-items:center;">
+                        <label style="display:flex; gap:8px; align-items:center;">
+                            <input type="radio" name="tipoCantidadML" id="tipoDiasML" value="dias" checked>
+                            <span>Días</span>
+                        </label>
+                        <label style="display:flex; gap:8px; align-items:center;">
+                            <input type="radio" name="tipoCantidadML" id="tipoHorasML" value="horas">
+                            <span>Horas</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="campoDiasML" style="margin-bottom: 20px;">
+                    <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
+                        <span style="color: #e74c3c;">*</span> Cantidad de Días:
+                    </label>
+                    <input type="number" id="cantidadDiasMedicinaLaboral" min="1" required
+                           style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                           placeholder="Ej: 7">
+                </div>
+
+                <div id="campoHorasML" style="margin-bottom: 20px; display: none;">
+                    <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
+                        <span style="color: #e74c3c;">*</span> Cantidad de Horas:
+                    </label>
+                    <input type="number" id="cantidadHorasMedicinaLaboral" min="1" step="0.5"
+                           style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                           placeholder="Ej: 4">
+                    <small style="color: #666; font-size: 14px;">Puede usar medios puntos (ej. 3.5)</small>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
+                        <span style="color: #e74c3c;">*</span> Diagnóstico:
+                    </label>
+                    <textarea id="diagnosticoMedicinaLaboral" required rows="4"
+                              style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; resize: vertical; box-sizing: border-box;"
+                              placeholder="Describa el diagnóstico médico..."></textarea>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
+                        <span style="color: #e74c3c;">*</span> Archivo Adjunto:
+                    </label>
+                    <input type="file" id="archivoAdjMedicinaLaboral" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required
+                           style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    <small style="color: #666; font-size: 14px;">Formatos permitidos: PDF, JPG, PNG, DOC, DOCX</small>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
+                        <span style="color: #e74c3c;">*</span> Administrador que Carga el Registro:
+                    </label>
+                    <input type="text" id="administradorMedicinaLaboral" required
+                           style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                           placeholder="Ingrese nombre y apellido del administrador...">
+                </div>
+
+                <div style="text-align: center;">
+                    <button type="submit" id="guardarMedicinaLaboral" 
+                            style="padding: 15px 30px; background: linear-gradient(135deg, #1427fdff 0%, #e83e8c 100%); color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s;">
+                        🏥 Registrar Medicina Laboral
+                    </button>
+                </div>
+
+                <div style="margin-top: 20px; padding: 15px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; color: #856404;">
+                    <strong>📝 Nota importante:</strong> Los campos marcados con <span style="color: #e74c3c;">*</span> son obligatorios. 
+                    Asegúrese de completar toda la información requerida antes de enviar el formulario.
+                </div>
+            </form>
+        `;
+    }
+
+    inicializarReferenciasDOMMedicinaLaboral() {
+        this.formularioMedicinaLaboral = document.getElementById('formularioMedicinaLaboral');
+        this.inputLegajoMedicinaLaboral = document.getElementById('legajoMedicinaLaboral');
+        this.inputNombreMedicinaLaboral = document.getElementById('nombreMedicinaLaboral');
+        this.inputApellidoMedicinaLaboral = document.getElementById('apellidoMedicinaLaboral');
+        this.inputFechaCertificadoMedicinaLaboral = document.getElementById('fechaCertificadoMedicinaLaboral');
+        this.radioTipoDiasML = document.getElementById('tipoDiasML');
+        this.radioTipoHorasML = document.getElementById('tipoHorasML');
+        this.inputCantidadDiasMedicinaLaboral = document.getElementById('cantidadDiasMedicinaLaboral');
+        this.inputCantidadHorasMedicinaLaboral = document.getElementById('cantidadHorasMedicinaLaboral');
+        this.campoDiasML = document.getElementById('campoDiasML');
+        this.campoHorasML = document.getElementById('campoHorasML');
+        this.diagnosticoMedicinaLaboral = document.getElementById('diagnosticoMedicinaLaboral');
+        this.archivoAdjMedicinaLaboral = document.getElementById('archivoAdjMedicinaLaboral');
+        this.inputAdministradorMedicinaLaboral = document.getElementById('administradorMedicinaLaboral');
+        this.botonGuardarMedicinaLaboral = document.getElementById('guardarMedicinaLaboral');
+    }
+
+    configurarEventosMedicinaLaboral() {
+        this.formularioMedicinaLaboral.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.guardarMedicinaLaboral();
+        });
+
+        // Agregar efecto hover al botón
+        this.botonGuardarMedicinaLaboral.onmouseover = () => {
+            this.botonGuardarMedicinaLaboral.style.transform = 'translateY(-2px)';
+            this.botonGuardarMedicinaLaboral.style.boxShadow = '0 5px 15px rgba(20, 39, 253, 0.4)';
+        };
+
+        this.botonGuardarMedicinaLaboral.onmouseout = () => {
+            this.botonGuardarMedicinaLaboral.style.transform = 'translateY(0)';
+            this.botonGuardarMedicinaLaboral.style.boxShadow = 'none';
+        };
+
+        // Toggle entre Días y Horas
+        this.radioTipoDiasML.addEventListener('change', () => this.toggleTipoCantidadMedicinaLaboral());
+        this.radioTipoHorasML.addEventListener('change', () => this.toggleTipoCantidadMedicinaLaboral());
+        // Estado inicial
+        this.toggleTipoCantidadMedicinaLaboral();
+    }
+
+    establecerFechaActualMedicinaLaboral() {
+        const ahora = new Date();
+        const fecha = ahora.toISOString().split('T')[0];
+        this.inputFechaCertificadoMedicinaLaboral.value = fecha;
+    }
+
+    toggleTipoCantidadMedicinaLaboral() {
+        const esDias = this.radioTipoDiasML.checked;
+        this.campoDiasML.style.display = esDias ? 'block' : 'none';
+        this.campoHorasML.style.display = esDias ? 'none' : 'block'
+        this.inputCantidadDiasMedicinaLaboral.required = esDias;
+        this.inputCantidadHorasMedicinaLaboral.required = !esDias;
+        if (esDias) {
+            this.inputCantidadHorasMedicinaLaboral.value = '';
+        } else {
+            this.inputCantidadDiasMedicinaLaboral.value = '';
+        }
+    }
+
+    async guardarMedicinaLaboral() {
+        if (!this.validarFormularioMedicinaLaboral()) {
+            return;
+        }
+
+        this.botonGuardarMedicinaLaboral.disabled = true;
+        this.botonGuardarMedicinaLaboral.textContent = '⏳ Subiendo archivo y guardando...'; // Mensaje más claro
+        this.botonGuardarMedicinaLaboral.style.background = '#6c757d';
+
+        try {
+            let datosMedicinaLaboral = this.recopilarDatosMedicinaLaboral();
+            let archivo = this.archivoAdjMedicinaLaboral.files[0];
+
+            if (archivo) {
+                const reader = new FileReader();
+                reader.readAsDataURL(archivo);
+                reader.onload = async () => {
+                    const base64Data = reader.result.split(',');
+                    const payload = {
+                        values: datosMedicinaLaboral,
+                        file: {
+                            base64: base64Data[1],
+                            type: archivo.type,
+                            name: archivo.name
+                        }
+                    };
+
+                    await this.enviarMedicinaLaboralAHoja(payload);
+                    this.mostrarMensajeExitoMedicinaLaboral();
+                    this.limpiarFormularioMedicinaLaboral();
+                };
+            } else {
+                const payload = { values: datosMedicinaLaboral };
+                await this.enviarMedicinaLaboralAHoja(payload);
+                this.mostrarMensajeExitoMedicinaLaboral();
+                this.limpiarFormularioMedicinaLaboral();
+            }
+
+        } catch (error) {
+        } finally {
+            this.restaurarBotonGuardarMedicinaLaboral();
+        }
+    }
+
+    validarFormularioMedicinaLaboral() {
+        const campos = [
+            { elemento: this.inputLegajoMedicinaLaboral, nombre: 'Número de Legajo' },
+            { elemento: this.inputNombreMedicinaLaboral, nombre: 'Nombre' },
+            { elemento: this.inputApellidoMedicinaLaboral, nombre: 'Apellido' },
+            { elemento: this.inputFechaCertificadoMedicinaLaboral, nombre: 'Fecha del Certificado' },
+            { elemento: this.diagnosticoMedicinaLaboral, nombre: 'Diagnóstico' },
+            { elemento: this.inputAdministradorMedicinaLaboral, nombre: 'Administrador' }
+        ];
+
+        for (const campo of campos) {
+            if (!campo.elemento.value.trim()) {
+                this.mostrarMensajeErrorMedicinaLaboral(`El campo "${campo.nombre}" es obligatorio.`);
+                campo.elemento.focus();
+                return false;
+            }
+        }
+
+        if (!/^\d+$/.test(this.inputLegajoMedicinaLaboral.value.trim())) {
+            this.mostrarMensajeErrorMedicinaLaboral('El número de legajo debe contener solo números.');
+            this.inputLegajoMedicinaLaboral.focus();
+            return false;
+        }
+
+        if (this.radioTipoDiasML.checked) {
+            const dias = parseInt(this.inputCantidadDiasMedicinaLaboral.value, 10);
+            if (isNaN(dias) || dias < 1) {
+                this.mostrarMensajeErrorMedicinaLaboral('La cantidad de días debe ser mayor a 0.');
+                this.inputCantidadDiasMedicinaLaboral.focus();
+                return false;
+            }
+        } else {
+            const horas = parseFloat(this.inputCantidadHorasMedicinaLaboral.value);
+            if (isNaN(horas) || horas <= 0) {
+                this.mostrarMensajeErrorMedicinaLaboral('La cantidad de horas debe ser mayor a 0.');
+                this.inputCantidadHorasMedicinaLaboral.focus();
+                return false;
+            }
+        }
+
+        if (this.diagnosticoMedicinaLaboral.value.trim().length < 5) {
+            this.mostrarMensajeErrorMedicinaLaboral('El diagnóstico debe tener al menos 5 caracteres.');
+            this.diagnosticoMedicinaLaboral.focus();
+            return false;
+        }
+
+
+        if (!this.archivoAdjMedicinaLaboral || this.archivoAdjMedicinaLaboral.files.length === 0) {
+            this.mostrarMensajeErrorMedicinaLaboral('Debe adjuntar un archivo (PDF, JPG, PNG, DOC o DOCX).');
+            this.archivoAdjMedicinaLaboral.focus();
+            return false;
+        }
+
+        return true;
+    }
+
+    recopilarDatosMedicinaLaboral() {
+        const fechaRegistro = new Date().toLocaleString('es-AR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        const archivoAdjunto = this.archivoAdjMedicinaLaboral.files.length > 0
+            ? this.archivoAdjMedicinaLaboral.files[0].name
+            : 'Sin archivo';
+
+        const esDias = this.radioTipoDiasML.checked;
+        const cantidad = esDias
+            ? this.inputCantidadDiasMedicinaLaboral.value
+            : this.inputCantidadHorasMedicinaLaboral.value;
+        const unidad = esDias ? 'Días' : 'Horas';
+
+        return [
+            this.inputLegajoMedicinaLaboral.value.trim(),
+            this.inputNombreMedicinaLaboral.value.trim(),
+            this.inputApellidoMedicinaLaboral.value.trim(),
+            this.inputFechaCertificadoMedicinaLaboral.value,
+            cantidad,
+            unidad,
+            this.diagnosticoMedicinaLaboral.value.trim(),
+            archivoAdjunto,
+            this.inputAdministradorMedicinaLaboral.value.trim(),
+            this.usuarioActual.dependencia || 'Sin Dependencia',
+            fechaRegistro
+        ];
+    }
+
+    async enviarMedicinaLaboralAHoja(payload) {
+        const APPS_SCRIPT_URL = `https://script.google.com/macros/s/AKfycbz0dgpx9Ywohz9PTZ4Uvdoo10I8Rrzhht-jQBA69h_bdOiIs_ApMhscFrkVGFv9ZIrs1Q/exec`;
+
+        try {
+            // Aseguramos que siempre se envía el nombre de la hoja de destino correcto
+            const enrichedPayload = {
+                ...payload,
+                sheetName: this.HOJA_MedicinaLaboral
+            };
+
+            await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(enrichedPayload)
+            });
+
+            console.log("Datos y/o archivo enviados a Apps Script exitosamente.");
+        } catch (error) {
+            console.error('Error al contactar con Google Apps Script:', error);
+            throw error;
+        }
+    }
+
+    mostrarMensajeExitoMedicinaLaboral() {
+        const mensaje = document.getElementById('mensajeMedicinaLaboral');
+        mensaje.style.display = 'block';
+        mensaje.style.backgroundColor = '#d4edda';
+        mensaje.style.color = '#155724';
+        mensaje.style.border = '1px solid #c3e6cb';
+        mensaje.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <span style="font-size: 24px;">✅</span>
+                <div>
+                    <strong>¡Registro de medicina laboral guardado exitosamente!</strong><br>
+                    <small>El reporte ha sido guardado en el sistema.</small>
+                </div>
+            </div>
+        `;
+        setTimeout(() => {
+            mensaje.style.display = 'none';
+        }, 5000);
+    }
+
+    mostrarMensajeErrorMedicinaLaboral(texto) {
+        const mensaje = document.getElementById('mensajeMedicinaLaboral');
+        mensaje.style.display = 'block';
+        mensaje.style.backgroundColor = '#f8d7da';
+        mensaje.style.color = '#721c24';
+        mensaje.style.border = '1px solid #f5c6cb';
+        mensaje.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <span style="font-size: 24px;">❌</span>
+                <div>
+                    <strong>Error:</strong><br>
+                    <small>${texto}</small>
+                </div>
+            </div>
+        `;
+
+        setTimeout(() => {
+            mensaje.style.display = 'none';
+        }, 5000);
+    }
+
+    limpiarFormularioMedicinaLaboral() {
+        this.inputLegajoMedicinaLaboral.value = '';
+        this.inputNombreMedicinaLaboral.value = '';
+        this.inputApellidoMedicinaLaboral.value = '';
+        this.inputCantidadDiasMedicinaLaboral.value = '';
+        this.inputCantidadHorasMedicinaLaboral.value = '';
+        this.diagnosticoMedicinaLaboral.value = '';
+        this.archivoAdjMedicinaLaboral.value = '';
+        this.inputAdministradorMedicinaLaboral.value = '';
+        this.establecerFechaActualMedicinaLaboral();
+        // Volver al modo Días por defecto
+        this.radioTipoDiasML.checked = true;
+        this.toggleTipoCantidadMedicinaLaboral();
+    }
+
+    restaurarBotonGuardarMedicinaLaboral() {
+        this.botonGuardarMedicinaLaboral.disabled = false;
+        this.botonGuardarMedicinaLaboral.textContent = '🏥 Registrar Medicina Laboral';
+        this.botonGuardarMedicinaLaboral.style.background = 'linear-gradient(135deg, #1427fdff 0%, #e83e8c 100%)';
     }
 }
 
