@@ -162,7 +162,10 @@ class GestorRecibos {
             .join('');
         return `
             <nav class="toolbar-downloads">
-                <div style="display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;">${links}</div>
+                <div style="max-width:1200px; margin:0 auto; padding:0 16px; display:flex; align-items:center; justify-content:center; gap:20px; flex-wrap:wrap;">
+                    <img src="logo.png" alt="Logo del Sistema de Gestión" style="height:100px; width:auto; object-fit:contain;">
+                    <div style="display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;">${links}</div>
+                </div>
             </nav>
         `;
     }

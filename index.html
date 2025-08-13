@@ -1,41 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualizador de Datos por Dependencia</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <nav class="toolbar-downloads" style="background: #fff; box-shadow: 0 2px 8px rgba(44,62,80,0.07); padding: 16px 0 8px 0; margin-bottom: 24px;">
-        <div style="display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;">
-            <a href="pdfs/IOMA.pdf" download class="download-link">Descargar IOMA</a>
-            <a href="pdfs/modelo_nota.pdf" download class="download-link">Modelo de Nota</a>
-            <a href="pdfs/ordenanzas.pdf" download class="download-link">Ordenanzas</a>
-            <a href="pdfs/normativa_medicina_laboral.pdf" download class="download-link">Normativa Medicina Laboral</a>
-        </div>
-    </nav>
-    <div class="container">
-        <header>
-            <h1>Inicio Sesion</h1>
-        </header>
-        
-        <div class="controls">
-            <select id="dependenciaSelect">
-                <option value="">Seleccionar Dependencia</option>
-            </select>
-            <button id="loadBtn">Cargar Recibos</button>
-        </div>
-        
-        <div class="loading" id="loading" style="display: none;">
-            Cargando recibos...
-        </div>
-        
-        <div class="recibos-container" id="recibosContainer">
-            
-        </div>
-    </div>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sistema de Gestión</title>
+        <link rel="stylesheet" href="style.css">
+        <script src="script.js" defer></script>
+        <style>
+            body { min-height: 100vh; margin: 0; }
+        </style>
     
-    <script src="script.js"></script>
+    
+    </head>
+<body>
+        <noscript>Habilita JavaScript para usar el sistema.</noscript>
 </body>
 </html>
