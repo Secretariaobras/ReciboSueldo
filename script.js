@@ -24,6 +24,7 @@ class GestorRecibos {
         // Variables para vacaciones
         this.vacacionesFiltradas = [];
         this.todasLasVacaciones = [];
+        this.encabezadosVacaciones = null;
         this.selectorDependenciaVacaciones = null;
         this.botonCargarVacaciones = null;
         this.cargandoVacaciones = null;
@@ -743,6 +744,7 @@ class GestorRecibos {
             }
 
             const encabezados = datos.values[0];
+            this.encabezadosVacaciones = encabezados;
             const filas = datos.values.slice(1);
 
             // Si es superadmin y selecciona "TODOS", mostrar todas las vacaciones
@@ -758,7 +760,7 @@ class GestorRecibos {
             }
 
             this.aplicarFiltrosVacaciones();
-            this.renderizarVacaciones(this.vacacionesFiltradas, encabezados);
+            this.renderizarVacaciones(this.vacacionesFiltradas, this.encabezadosVacaciones);
 
         } catch (error) {
             console.error('Error cargando vacaciones:', error);
@@ -793,7 +795,7 @@ class GestorRecibos {
         if (this.vacacionesFiltradas.length === 0) {
             this.mostrarErrorVacaciones('No se encontraron vacaciones con ese número de legajo');
         } else {
-            const encabezados = ['Legajo', 'Nombre', 'Fecha Inicio', 'Fecha Fin', 'Dependencia'];
+            const encabezados = this.encabezadosVacaciones || ['Legajo', 'Nombre'];
             this.renderizarVacaciones(this.vacacionesFiltradas, encabezados);
         }
     }
@@ -803,7 +805,7 @@ class GestorRecibos {
 
         if (this.todasLasVacaciones && this.todasLasVacaciones.length > 0) {
             this.vacacionesFiltradas = [...this.todasLasVacaciones];
-            const encabezados = ['Legajo', 'Nombre', 'Fecha Inicio', 'Fecha Fin', 'Dependencia'];
+            const encabezados = this.encabezadosVacaciones || ['Legajo', 'Nombre'];
             this.contenedorVacaciones.innerHTML = '';
             this.renderizarVacaciones(this.vacacionesFiltradas, encabezados);
         }
