@@ -221,38 +221,38 @@ class GestorRecibos {
 
     obtenerHTMLMenu() {
         return `
-            <div class="container" style="max-width: 800px; margin: 0 auto; padding: 20px; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
-                <div style="background: white; border-radius: 20px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; width: 100%;">
+            <div class="menu-page">
+                <div class="menu-card">
                     ${this.obtenerHTMLHeaderMenu()}
-                    
-                    <h1 style="color: #333; margin-bottom: 30px; font-size: 32px;">🏢 Sistema de Gestión</h1>
-                    
-                    <div class="menu-options" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 30px;">
-                        <button onclick="gestorRecibos.mostrarModuloRecibos()" class="menu-btn" style="padding: 30px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+
+                    <h1 class="menu-title">🏢 Sistema de Gestión</h1>
+
+                    <div class="menu-options">
+                        <button onclick="gestorRecibos.mostrarModuloRecibos()" class="menu-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; font-weight: bold;">
                             📋<br>Recibos de Sueldo
                         </button>
-                        
-                        <button onclick="gestorRecibos.mostrarModuloVacaciones()" class="menu-btn" style="padding: 30px 20px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+
+                        <button onclick="gestorRecibos.mostrarModuloVacaciones()" class="menu-btn" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none; font-weight: bold;">
                             🏖️<br>Vacaciones
                         </button>
-                        
-                        <button onclick="gestorRecibos.mostrarModuloBajas()" class="menu-btn" style="padding: 30px 20px; background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%); color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+
+                        <button onclick="gestorRecibos.mostrarModuloBajas()" class="menu-btn" style="background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%); color: white; border: none; font-weight: bold;">
                             ⚠️<br>Bajas Sin Cubrir
                         </button>
-                        
-                        <button onclick="gestorRecibos.mostrarModuloPersonalActivo()" class="menu-btn" style="padding: 30px 20px; background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%); color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+
+                        <button onclick="gestorRecibos.mostrarModuloPersonalActivo()" class="menu-btn" style="background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%); color: white; border: none; font-weight: bold;">
                             👥<br>Personal Activo
                         </button>
 
-                        <button onclick="gestorRecibos.mostrarModuloRecategorizacion()" class="menu-btn" style="padding: 30px 20px; background: linear-gradient(135deg, #4a4f4eff 0%, #070707ff 100%); color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+                        <button onclick="gestorRecibos.mostrarModuloRecategorizacion()" class="menu-btn" style="background: linear-gradient(135deg, #4a4f4eff 0%, #070707ff 100%); color: white; border: none; font-weight: bold;">
                             🔄<br>Recategorización
                         </button>
-                        
-                        <button onclick="gestorRecibos.mostrarModuloAccidentes()" class="menu-btn" style="padding: 30px 20px; background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%); color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+
+                        <button onclick="gestorRecibos.mostrarModuloAccidentes()" class="menu-btn" style="background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%); color: white; border: none; font-weight: bold;">
                             🚨<br>Registrar Accidente
                         </button>
 
-                        <button onclick="gestorRecibos.mostrarModuloMedicinaLaboral()" class="menu-btn" style="padding: 30px 20px; background: linear-gradient(135deg, #1427fdff 0%, #e83e8c 100%); color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+                        <button onclick="gestorRecibos.mostrarModuloMedicinaLaboral()" class="menu-btn" style="background: linear-gradient(135deg, #1427fdff 0%, #e83e8c 100%); color: white; border: none; font-weight: bold;">
                             🏥<br>Medicina Laboral
                         </button>
                     </div>
