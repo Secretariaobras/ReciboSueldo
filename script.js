@@ -8,6 +8,8 @@ class GestorRecibos {
         this.HOJA_PersonalActivo = 'Personal Activo';
         this.HOJA_ACCIDENTES = 'Accidentes';
         this.HOJA_MedicinaLaboral = 'Medicina Laboral';
+        this.HOJA_RECATEGORIZACION = "datos_recategorizacion";
+        this.HOJA_Escalafon = "Escalafon";
 
         this.usuarios = {};
         this.usuarioActual = null;
@@ -49,6 +51,11 @@ class GestorRecibos {
         this.contenedorPersonalActivo = null;
         this.inputLegajoPersonalActivo = null;
 
+        // Variables para recategorización
+        this.inputLegajoRecategorizacion = null;
+        this.botonBuscarRecategorizacion = null;
+        this.recategorizacionDatos = null;
+
         // Variables para accidentes
         this.formularioAccidente = null;
         this.inputLegajoAccidente = null;
@@ -71,7 +78,6 @@ class GestorRecibos {
         this.diagnosticoMedicinaLaboral = null;
         this.archivoAdjMedicinaLaboral = null;
         this.inputAdministradorMedicinaLaboral = null;
-
 
         this.pdfLinks = [
             { href: 'pdfs/IOMA.pdf', label: 'IOMA', icon: '📄' },
@@ -236,6 +242,10 @@ class GestorRecibos {
                         
                         <button onclick="gestorRecibos.mostrarModuloPersonalActivo()" class="menu-btn" style="padding: 30px 20px; background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%); color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
                             👥<br>Personal Activo
+                        </button>
+
+                        <button onclick="gestorRecibos.mostrarModuloRecategorizacion()" class="menu-btn" style="padding: 30px 20px; background: linear-gradient(135deg, #4a4f4eff 0%, #070707ff 100%); color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+                            🔄<br>Recategorización
                         </button>
                         
                         <button onclick="gestorRecibos.mostrarModuloAccidentes()" class="menu-btn" style="padding: 30px 20px; background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%); color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
@@ -601,6 +611,249 @@ class GestorRecibos {
         `;
     }
 
+    //MODULO DE RECATEGORIZACION
+
+    mostrarModuloRecategorizacion() {
+        document.body.innerHTML = this.obtenerHTMLRecategorizacion();
+        this.inicializarReferenciasDOMRecategorizacion();
+    }
+
+    obtenerHTMLRecategorizacion() {
+        return `
+            <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+                <div class="header" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                    ${this.obtenerHTMLHeaderRecategorizacion()}
+                    ${this.obtenerHTMLControlesRecategorizacion()}
+                </div>
+
+                <div id="loadingRecategorizacion" style="display: none; text-align: center; padding: 40px; font-size: 18px; color: #4a4f4eff;">
+                    ⏳ Cargando recategorización...
+                </div>
+
+                <div id="recategorizacionContainer"></div>
+            </div>
+        `;
+    }
+
+    obtenerHTMLHeaderRecategorizacion() {
+        return `
+            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #4a4f4eff 0%, #070707ff 100%); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
+                <div>
+                    <strong>👤 ${this.usuarioActual.username}</strong>
+                    <br>
+                    <small>${this.usuarioActual.dependencia || 'Super Administrador'}</small>
+                </div>
+                <button onclick="gestorRecibos.cerrarSesion()" style="background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 5px; cursor: pointer;">
+                    🚪 Cerrar Sesión
+                </button>
+            </div>
+
+            <h1 style="text-align: center; color: #333; margin-bottom: 20px;">🔄 Sistema de Recategorización</h1>
+        `;
+    }
+
+    obtenerHTMLControlesRecategorizacion() {
+        return `
+            <div class="controls" style="display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; margin-bottom: 12px;">
+                <input type="text" id="legajoInputRecategorizacion" placeholder="Ingresar legajo..." 
+                    style="padding: 10px; border: 2px solid #e1e1e1; border-radius: 5px; font-size: 16px; min-width: 180px;">
+                <button id="buscarBtnRecategorizacion" 
+                    style="padding: 10px 16px; background: linear-gradient(135deg, #4a4f4eff 0%, #070707ff 100%); color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold;">
+                    🔍 Buscar
+                </button>
+                <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                    ⬅️ Volver al Menú Principal
+                </button>
+            </div>
+        `;
+    }
+
+    inicializarReferenciasDOMRecategorizacion() {
+        this.cargando = document.getElementById('loadingRecategorizacion');
+        this.contenedorRecibos = document.getElementById('recategorizacionContainer');
+        this.inputLegajoRecategorizacion = document.getElementById('legajoInputRecategorizacion');
+        this.botonBuscarRecategorizacion = document.getElementById('buscarBtnRecategorizacion');
+
+        if (this.botonBuscarRecategorizacion) {
+            this.botonBuscarRecategorizacion.addEventListener('click', () => this.buscarLegajoRecategorizacion());
+        }
+        if (this.inputLegajoRecategorizacion) {
+            this.inputLegajoRecategorizacion.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.buscarLegajoRecategorizacion();
+                }
+            });
+        }
+    }
+
+    async buscarLegajoRecategorizacion() {
+        const legajo = (this.inputLegajoRecategorizacion?.value || '').trim();
+        if (!legajo) {
+            alert('Por favor ingrese un número de legajo');
+            this.inputLegajoRecategorizacion?.focus();
+            return;
+        }
+        if (!/^\d+$/.test(legajo)) {
+            alert('El legajo debe ser numérico');
+            this.inputLegajoRecategorizacion?.focus();
+            return;
+        }
+
+        if (this.cargando) this.cargando.style.display = 'block';
+        if (this.contenedorRecibos) this.contenedorRecibos.innerHTML = '';
+
+        try {
+            const datos = await this.obtenerDatosHoja(`${this.HOJA_PersonalActivo}!A:D`);
+            const filas = datos?.values?.slice(1) || [];
+            const dependenciaUsuario = this.usuarioActual?.dependencia || '';
+            const isSuperAdmin = this.usuarioActual?.role === 'superadmin';
+
+            const coincidencia = filas.find(fila => {
+                const legajoFila = String(fila[0] || '').trim(); // Col A
+                const dependenciaFila = String(fila[3] || '').trim(); // Col D
+                return legajoFila === legajo && (isSuperAdmin || dependenciaFila === dependenciaUsuario);
+            });
+
+            if (!coincidencia) {
+                this.contenedorRecibos.innerHTML = `
+                    <div style="text-align: center; color: #e74c3c; font-size: 16px; padding: 24px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+                        ❌ No se encontró un registro para el legajo ${legajo}${isSuperAdmin ? '' : ' en su dependencia'}.
+                    </div>
+                `;
+                return;
+            }
+
+            const [colA, colB, colC] = [coincidencia[0] || 'N/A', coincidencia[1] || 'N/A', coincidencia[2] || 'N/A'];
+            const dependenciaEncontrada = coincidencia[3] || 'N/A';
+
+            // Obtener categorías desde HOJA_Escalafon (columna A)
+            let opcionesCategorias = '<option value="">Seleccione una categoría</option>';
+            try {
+                const datosEsc = await this.obtenerDatosHoja(`${this.HOJA_Escalafon}!A:A`);
+                const categorias = [...new Set((datosEsc?.values || []).slice(1).map(f => f[0]).filter(Boolean))];
+                if (categorias.length > 0) {
+                    opcionesCategorias += categorias.map(c => `<option value="${c}">${c}</option>`).join('');
+                }
+            } catch (e) {
+                console.warn('No se pudieron cargar las categorías de Escalafon:', e);
+            }
+
+            // Guardar datos para el envío posterior
+            this.recategorizacionDatos = { legajo: colA, nombre: colB, categoriaActual: colC };
+
+            this.contenedorRecibos.innerHTML = `
+                <div class="recategorizacion-card" style="background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, #4a4f4eff 0%, #070707ff 100%); color: white; padding: 14px 18px; font-weight: bold; display:flex; justify-content:space-between; align-items:center;">
+                        <span>🔎 Resultado de Búsqueda</span>
+                        <span>Legajo: ${colA}</span>
+                    </div>
+                    <div style="padding: 16px;">
+                        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f0f0f0;">
+                            <div style="font-weight:bold; color:#555;">Nombre Completo:</div>
+                            <div style="color:#333;">${colB}</div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; padding:8px 0;">
+                            <div style="font-weight:bold; color:#555;">Categoria Actual:</div>
+                            <div style="color:#333;">${colC}</div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:8px 0;">
+                            <div style="font-weight:bold; color:#555;">Categoria Solicitada:</div>
+                            <div style="flex:1; text-align:right;">
+                                <select id="categoriaSolicitadaSelect" style="min-width:220px; padding:8px 10px; border:2px solid #e1e1e1; border-radius:6px; font-size:14px;">
+                                    ${opcionesCategorias}
+                                </select>
+                            </div>
+                        </div>
+                        <div style="text-align:right; margin-top:12px;">
+                            <button id="solicitarRecategorizacionBtn" onclick="gestorRecibos.solicitarRecategorizacion()" 
+                                style="padding: 10px 16px; background: linear-gradient(135deg, #4a4f4eff 0%, #070707ff 100%); color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold;">
+                                📝 Solicitar Recategorización
+                            </button>
+                        </div>
+                        <div id="mensajeRecategorizacion" style="display:none; margin-top:12px; padding:12px; border-radius:8px; font-weight:bold; text-align:center;"></div>
+                    </div>
+                </div>
+            `;
+
+        } catch (error) {
+            console.error('Error buscando legajo en Personal Activo:', error);
+            this.contenedorRecibos.innerHTML = `
+                <div style="text-align: center; color: #e74c3c; font-size: 16px; padding: 24px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+                    ❌ Ocurrió un error al buscar el legajo. Intente nuevamente.
+                </div>
+            `;
+        } finally {
+            if (this.cargando) this.cargando.style.display = 'none';
+        }
+    }
+
+    async solicitarRecategorizacion() {
+        const btn = document.getElementById('solicitarRecategorizacionBtn');
+        const select = document.getElementById('categoriaSolicitadaSelect');
+        const msg = document.getElementById('mensajeRecategorizacion');
+
+        if (!this.recategorizacionDatos) return;
+        if (!select || !select.value) {
+            alert('Seleccione una categoría solicitada.');
+            select?.focus();
+            return;
+        }
+
+        const { legajo, nombre, categoriaActual } = this.recategorizacionDatos;
+        const categoriaSolicitada = select.value;
+
+        // Deshabilitar botón mientras envía
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '⏳ Enviando solicitud...';
+            btn.style.opacity = '0.8';
+        }
+
+        try {
+            await this.enviarRecategorizacionAHoja([legajo, nombre, categoriaActual, categoriaSolicitada]);
+            if (msg) {
+                msg.style.display = 'block';
+                msg.style.backgroundColor = '#d4edda';
+                msg.style.color = '#155724';
+                msg.style.border = '1px solid #c3e6cb';
+                msg.innerHTML = '✅ Solicitud enviada correctamente';
+            }
+        } catch (error) {
+            console.error('Error enviando recategorización:', error);
+            if (msg) {
+                msg.style.display = 'block';
+                msg.style.backgroundColor = '#f8d7da';
+                msg.style.color = '#721c24';
+                msg.style.border = '1px solid #f5c6cb';
+                msg.innerHTML = '❌ No se pudo enviar la solicitud. Intente nuevamente.';
+            }
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = '📝 Solicitar Recategorización';
+                btn.style.opacity = '1';
+            }
+        }
+    }
+
+    async enviarRecategorizacionAHoja(values) {
+        const APPS_SCRIPT_URL = `https://script.google.com/macros/s/AKfycbz0dgpx9Ywohz9PTZ4Uvdoo10I8Rrzhht-jQBA69h_bdOiIs_ApMhscFrkVGFv9ZIrs1Q/exec`;
+        const payload = {
+            values,
+            sheetName: this.HOJA_RECATEGORIZACION,
+            insertAtTop: true
+        };
+        const res = await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+            throw new Error(`Apps Script respondió ${res.status}`);
+        }
+        return true;
+    }
+
     // MÓDULO DE VACACIONES
     mostrarModuloVacaciones() {
         document.body.innerHTML = this.obtenerHTMLVacaciones();
@@ -747,7 +1000,6 @@ class GestorRecibos {
             this.encabezadosVacaciones = encabezados;
             const filas = datos.values.slice(1);
 
-            // Si es superadmin y selecciona "TODOS", mostrar todas las vacaciones
             if (this.usuarioActual.role === 'superadmin' && dependenciaSeleccionada === 'TODOS') {
                 this.todasLasVacaciones = filas;
             } else {
@@ -1021,7 +1273,6 @@ class GestorRecibos {
             const encabezados = datos.values[0];
             const filas = datos.values.slice(1);
 
-            // Si es superadmin y selecciona "TODOS", mostrar todas las bajas
             if (this.usuarioActual.role === 'superadmin' && dependenciaSeleccionada === 'TODOS') {
                 this.todasLasBajas = filas;
             } else {
@@ -1294,7 +1545,6 @@ class GestorRecibos {
             const encabezados = datos.values[0];
             const filas = datos.values.slice(1);
 
-            // Si es superadmin y selecciona "TODOS", mostrar todo el personal
             if (this.usuarioActual.role === 'superadmin' && dependenciaSeleccionada === 'TODOS') {
                 this.todosLosPersonalActivo = filas;
             } else {
@@ -1389,11 +1639,11 @@ class GestorRecibos {
         const cargo = persona[2] || 'N/A';
         const estado = persona[3] || 'N/A';
 
-        let estadoColor = '#28a745'; // Verde por defecto (activo)
+        let estadoColor = '#28a745';
         if (estado.toLowerCase().includes('inactivo') || estado.toLowerCase().includes('baja')) {
-            estadoColor = '#dc3545'; // Rojo
+            estadoColor = '#dc3545';
         } else if (estado.toLowerCase().includes('licencia') || estado.toLowerCase().includes('suspendido')) {
-            estadoColor = '#ffc107'; // Amarillo
+            estadoColor = '#ffc107';
         }
 
         return `
@@ -2132,7 +2382,6 @@ class GestorRecibos {
         const APPS_SCRIPT_URL = `https://script.google.com/macros/s/AKfycbz0dgpx9Ywohz9PTZ4Uvdoo10I8Rrzhht-jQBA69h_bdOiIs_ApMhscFrkVGFv9ZIrs1Q/exec`;
 
         try {
-            // Aseguramos que siempre se envía el nombre de la hoja de destino correcto
             const enrichedPayload = {
                 ...payload,
                 sheetName: this.HOJA_MedicinaLaboral
@@ -2201,7 +2450,6 @@ class GestorRecibos {
         this.archivoAdjMedicinaLaboral.value = '';
         this.inputAdministradorMedicinaLaboral.value = '';
         this.establecerFechaActualMedicinaLaboral();
-        // Volver al modo Días por defecto
         this.radioTipoDiasML.checked = true;
         this.toggleTipoCantidadMedicinaLaboral();
     }
