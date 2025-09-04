@@ -1,6 +1,28 @@
+/* --- Tema (colores centralizados) --- */
+:root {
+    /* Ajusta estos valores a la paleta oficial de la Municipalidad de San Miguel */
+    --brand-primary: #006a4e;       /* Sugerido: verde institucional */
+    --brand-secondary: #143d59;     /* Sugerido: azul institucional */
+    --brand-accent: #00a86b;        /* Sugerido: verde acento */
+
+    --surface: #ffffff;
+    --bg: #f5f7f9;
+    --text: #333333;
+    --text-strong: #2c3e50;
+    --muted: #7f8c8d;
+    --neutral: #6c757d;
+
+    --border: #e1e1e1;
+    --error: #e74c3c;
+    --error-bg: #fdf2f2;
+    --error-border: #f5c6cb;
+
+    --primary-contrast: #ffffff; /* texto sobre primario */
+}
+
 /* --- Barra de herramientas de descargas --- */
 .toolbar-downloads {
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(90deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
     box-shadow: 0 4px 18px rgba(44,62,80,0.13);
     padding: 18px 0 12px 0;
     margin-bottom: 28px;
@@ -15,7 +37,7 @@
     gap: 10px;
     padding: 12px 28px;
     background: rgba(255,255,255,0.13);
-    color: #fff;
+    color: var(--primary-contrast);
     border-radius: 9px;
     font-size: 17px;
     font-weight: 600;
@@ -29,7 +51,7 @@
 }
 .toolbar-downloads .download-link:hover {
     background: rgba(255,255,255,0.22);
-    color: #222;
+    color: var(--text-strong);
     transform: translateY(-3px) scale(1.06);
     box-shadow: 0 4px 16px rgba(44,62,80,0.18);
     border-color: #fff;
@@ -42,8 +64,8 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f5f5f5;
-    color: #333;
+    background-color: var(--bg);
+    color: var(--text);
 }
 
 .container {
@@ -58,7 +80,7 @@ header {
 }
 
 header h1 {
-    color: #2c3e50;
+    color: var(--text-strong);
     font-size: 2.5rem;
     margin-bottom: 10px;
 }
@@ -73,7 +95,7 @@ header h1 {
 
 #dependenciaSelect {
     padding: 12px 20px;
-    border: 2px solid #ddd;
+    border: 2px solid var(--border);
     border-radius: 8px;
     font-size: 16px;
     min-width: 200px;
@@ -81,8 +103,8 @@ header h1 {
 
 #loadBtn {
     padding: 12px 25px;
-    background-color: #3498db;
-    color: white;
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+    color: var(--primary-contrast);
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -91,18 +113,18 @@ header h1 {
 }
 
 #loadBtn:hover {
-    background-color: #2980b9;
+    filter: brightness(1.05);
 }
 
 .loading {
     text-align: center;
     font-size: 18px;
-    color: #666;
+    color: var(--brand-primary);
     margin: 20px 0;
 }
 
 .recibo-card {
-    background: white;
+    background: var(--surface);
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
@@ -127,13 +149,13 @@ header h1 {
 .recibo-title {
     font-size: 1.2rem;
     font-weight: bold;
-    color: #2c3e50;
+    color: var(--text-strong);
 }
 
 .download-btn {
     padding: 8px 15px;
-    background-color: #27ae60;
-    color: white;
+    background-color: var(--brand-accent);
+    color: var(--primary-contrast);
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -142,7 +164,7 @@ header h1 {
 }
 
 .download-btn:hover {
-    background-color: #229954;
+    filter: brightness(0.95);
 }
 
 .download-btn:disabled {
@@ -163,23 +185,23 @@ header h1 {
 
 .detail-label {
     font-weight: bold;
-    color: #7f8c8d;
+    color: var(--muted);
     font-size: 0.9rem;
     margin-bottom: 5px;
 }
 
 .detail-value {
     font-size: 1rem;
-    color: #2c3e50;
+    color: var(--text-strong);
 }
 
 .error-message {
     text-align: center;
-    color: #e74c3c;
+    color: var(--error);
     font-size: 18px;
     padding: 20px;
-    background-color: #fdf2f2;
-    border: 1px solid #f5c6cb;
+    background-color: var(--error-bg);
+    border: 1px solid var(--error-border);
     border-radius: 8px;
     margin: 20px 0;
 }
@@ -197,7 +219,7 @@ header h1 {
 /* --- Responsive menu layout --- */
 .menu-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -205,7 +227,7 @@ header h1 {
 }
 
 .menu-card {
-    background: #fff;
+    background: var(--surface);
     width: 100%;
     max-width: 1000px;
     border-radius: 20px;
@@ -215,7 +237,7 @@ header h1 {
 }
 
 .menu-title {
-    color: #333;
+    color: var(--text);
     margin-bottom: 22px;
     font-size: clamp(22px, 3.2vw, 34px);
 }

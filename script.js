@@ -95,12 +95,12 @@ class GestorRecibos {
             this.mostrarLogin();
         } catch (error) {
             document.body.innerHTML = `
-                <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: Arial, sans-serif; color: white; text-align: center;">
+                <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); font-family: Arial, sans-serif; color: var(--primary-contrast); text-align: center;">
                     <div style="background: rgba(255,255,255,0.1); padding: 40px; border-radius: 15px; backdrop-filter: blur(10px);">
                         <h2>❌ Error de conexión</h2>
                         <p>No se pudieron cargar los usuarios del sistema.</p>
                         <p>Verifica tu conexión a internet y la configuración de la hoja de cálculo.</p>
-                        <button onclick="location.reload()" style="padding: 10px 20px; background: white; color: #667eea; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 20px;">
+                        <button onclick="location.reload()" style="padding: 10px 20px; background: var(--surface); color: var(--brand-primary); border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 20px;">
                             🔄 Intentar nuevamente
                         </button>
                     </div>
@@ -140,24 +140,24 @@ class GestorRecibos {
     obtenerHTMLLogin() {
         return `
             ${this.getToolbarDownloadsHTML()}
-            <div class="login-container" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: Arial, sans-serif;">
-                <div class="login-form" style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 350px; text-align: center;">
-                    <h2 style="color: #333; margin-bottom: 30px; font-size: 28px;">Sistema de Gestión</h2>
+            <div class="login-container" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); font-family: Arial, sans-serif;">
+                <div class="login-form" style="background: var(--surface); padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 350px; text-align: center;">
+                    <h2 style="color: var(--text); margin-bottom: 30px; font-size: 28px;">Sistema de Gestión</h2>
                     <p style="color: #666; margin-bottom: 25px;">Inicia sesión para acceder</p>
                     <form id="loginForm">
                         <div style="margin-bottom: 20px; text-align: left;">
                             <label style="color: #555; font-weight: bold;">Usuario:</label>
-                            <input type="text" id="username" required style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; margin-top: 5px; box-sizing: border-box;">
+                            <input type="text" id="username" required style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; margin-top: 5px; box-sizing: border-box;">
                         </div>
                         <div style="margin-bottom: 25px; text-align: left;">
                             <label style="color: #555; font-weight: bold;">Contraseña:</label>
-                            <input type="password" id="password" required style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; margin-top: 5px; box-sizing: border-box;">
+                            <input type="password" id="password" required style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; margin-top: 5px; box-sizing: border-box;">
                         </div>
-                        <button type="submit" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">
+                        <button type="submit" style="width: 100%; padding: 12px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">
                             Ingresar
                         </button>
                     </form>
-                    <div id="loginError" style="color: #e74c3c; text-align: center; margin-top: 15px; font-weight: bold;"></div>
+                    <div id="loginError" style="color: var(--error); text-align: center; margin-top: 15px; font-weight: bold;"></div>
                 </div>
             </div>
         `;
@@ -220,7 +220,7 @@ class GestorRecibos {
     }
 
     obtenerHTMLMenu() {
-        return `
+    return `
             <div class="menu-page">
                 <div class="menu-card">
                     ${this.obtenerHTMLHeaderMenu()}
@@ -228,31 +228,31 @@ class GestorRecibos {
                     <h1 class="menu-title">🏢 Sistema de Gestión</h1>
 
                     <div class="menu-options">
-                        <button onclick="gestorRecibos.mostrarModuloRecibos()" class="menu-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; font-weight: bold;">
+            <button onclick="gestorRecibos.mostrarModuloRecibos()" class="menu-btn" style="background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; font-weight: bold;">
                             📋<br>Recibos de Sueldo
                         </button>
 
-                        <button onclick="gestorRecibos.mostrarModuloVacaciones()" class="menu-btn" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none; font-weight: bold;">
+            <button onclick="gestorRecibos.mostrarModuloVacaciones()" class="menu-btn" style="background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; font-weight: bold;">
                             🏖️<br>Vacaciones
                         </button>
 
-                        <button onclick="gestorRecibos.mostrarModuloBajas()" class="menu-btn" style="background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%); color: white; border: none; font-weight: bold;">
+            <button onclick="gestorRecibos.mostrarModuloBajas()" class="menu-btn" style="background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; font-weight: bold;">
                             ⚠️<br>Bajas Sin Cubrir
                         </button>
 
-                        <button onclick="gestorRecibos.mostrarModuloPersonalActivo()" class="menu-btn" style="background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%); color: white; border: none; font-weight: bold;">
+            <button onclick="gestorRecibos.mostrarModuloPersonalActivo()" class="menu-btn" style="background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; font-weight: bold;">
                             👥<br>Personal Activo
                         </button>
 
-                        <button onclick="gestorRecibos.mostrarModuloRecategorizacion()" class="menu-btn" style="background: linear-gradient(135deg, #4a4f4eff 0%, #070707ff 100%); color: white; border: none; font-weight: bold;">
+            <button onclick="gestorRecibos.mostrarModuloRecategorizacion()" class="menu-btn" style="background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; font-weight: bold;">
                             🔄<br>Recategorización
                         </button>
 
-                        <button onclick="gestorRecibos.mostrarModuloAccidentes()" class="menu-btn" style="background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%); color: white; border: none; font-weight: bold;">
+            <button onclick="gestorRecibos.mostrarModuloAccidentes()" class="menu-btn" style="background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; font-weight: bold;">
                             🚨<br>Registrar Accidente
                         </button>
 
-                        <button onclick="gestorRecibos.mostrarModuloMedicinaLaboral()" class="menu-btn" style="background: linear-gradient(135deg, #1427fdff 0%, #e83e8c 100%); color: white; border: none; font-weight: bold;">
+            <button onclick="gestorRecibos.mostrarModuloMedicinaLaboral()" class="menu-btn" style="background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; font-weight: bold;">
                             🏥<br>Medicina Laboral
                         </button>
                     </div>
@@ -263,7 +263,7 @@ class GestorRecibos {
 
     obtenerHTMLHeaderMenu() {
         return `
-            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
+            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
                 <div>
                     <strong>👤 ${this.usuarioActual.username}</strong>
                     <br>
@@ -293,20 +293,20 @@ class GestorRecibos {
     }
 
     obtenerHTMLInterfaz() {
-        return `
+    return `
             <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-                <div class="header" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+        <div class="header" style="background: var(--surface); padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
                     ${this.obtenerHTMLHeader()}
                     ${this.obtenerHTMLControles()}
                     
                     <div style="text-align: center; margin-top: 20px;">
-                        <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+            <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: var(--neutral); color: var(--primary-contrast); border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
                             ⬅️ Volver al Menú Principal
                         </button>
                     </div>
                 </div>
                 
-                <div id="loading" style="display: none; text-align: center; padding: 40px; font-size: 18px; color: #667eea;">
+        <div id="loading" style="display: none; text-align: center; padding: 40px; font-size: 18px; color: var(--brand-primary);">
                     ⏳ Cargando recibos...
                 </div>
                 
@@ -317,7 +317,7 @@ class GestorRecibos {
 
     obtenerHTMLHeader() {
         return `
-            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
+            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
                 <div>
                     <strong>👤 ${this.usuarioActual.username}</strong>
                     <br>
@@ -328,24 +328,24 @@ class GestorRecibos {
                 </button>
             </div>
             
-            <h1 style="text-align: center; color: #333; margin-bottom: 20px;">📋 Sistema de Gestión de Recibos</h1>
+            <h1 style="text-align: center; color: var(--text); margin-bottom: 20px;">📋 Sistema de Gestión de Recibos</h1>
         `;
     }
 
     obtenerHTMLControles() {
-        return `
+    return `
             <div class="controls" style="display: flex; gap: 15px; align-items: center; justify-content: center; flex-wrap: wrap;">
-                <select id="dependenciaSelect" style="padding: 10px; border: 2px solid #e1e1e1; border-radius: 5px; font-size: 16px; min-width: 200px;">
+        <select id="dependenciaSelect" style="padding: 10px; border: 2px solid var(--border); border-radius: 5px; font-size: 16px; min-width: 200px;">
                     <option value="">Selecciona una dependencia</option>
                 </select>
                 
-                <input type="text" id="legajoInput" placeholder="Filtrar por legajo..." style="padding: 10px; border: 2px solid #e1e1e1; border-radius: 5px; font-size: 16px; min-width: 150px;">
+        <input type="text" id="legajoInput" placeholder="Filtrar por legajo..." style="padding: 10px; border: 2px solid var(--border); border-radius: 5px; font-size: 16px; min-width: 150px;">
                 
-                <button id="loadBtn" style="padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;">
+        <button id="loadBtn" style="padding: 10px 20px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;">
                     📥 Cargar Recibos
                 </button>
                 
-                <button id="clearBtn" style="padding: 10px 15px; background: #6c757d; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+        <button id="clearBtn" style="padding: 10px 15px; background: var(--neutral); color: var(--primary-contrast); border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
                     🗑️ Limpiar
                 </button>
             </div>
@@ -543,7 +543,7 @@ class GestorRecibos {
     obtenerHTMLTarjeta(recibo, encabezados, indice) {
         const legajo = recibo[1] || 'N/A';
         return `
-            <div class="recibo-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div class="recibo-header" style="background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
                 <div style="font-size: 18px; font-weight: bold;">
                     📄 Recibo #${indice + 1} - Legajo: ${legajo}
                 </div>
@@ -564,7 +564,7 @@ class GestorRecibos {
                 return `
                     <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
                         <div style="font-weight: bold; color: #555; flex: 1;">${encabezado}:</div>
-                        <div style="color: #333; flex: 2; text-align: right;">${recibo[i] || 'N/A'}</div>
+                        <div style="color: var(--text); flex: 2; text-align: right;">${recibo[i] || 'N/A'}</div>
                     </div>
                 `;
             })
@@ -605,7 +605,7 @@ class GestorRecibos {
 
     mostrarError(mensaje) {
         this.contenedorRecibos.innerHTML = `
-            <div style="text-align: center; color: #e74c3c; font-size: 18px; padding: 40px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="text-align: center; color: var(--error); font-size: 18px; padding: 40px; background: var(--surface); border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
                 ❌ ${mensaje}
             </div>
         `;
@@ -621,7 +621,7 @@ class GestorRecibos {
     obtenerHTMLRecategorizacion() {
         return `
             <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-                <div class="header" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                <div class="header" style="background: var(--surface); padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
                     ${this.obtenerHTMLHeaderRecategorizacion()}
                     ${this.obtenerHTMLControlesRecategorizacion()}
                 </div>
@@ -637,7 +637,7 @@ class GestorRecibos {
 
     obtenerHTMLHeaderRecategorizacion() {
         return `
-            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #4a4f4eff 0%, #070707ff 100%); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
+            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
                 <div>
                     <strong>👤 ${this.usuarioActual.username}</strong>
                     <br>
@@ -648,7 +648,7 @@ class GestorRecibos {
                 </button>
             </div>
 
-            <h1 style="text-align: center; color: #333; margin-bottom: 20px;">🔄 Sistema de Recategorización</h1>
+            <h1 style="text-align: center; color: var(--text); margin-bottom: 20px;">🔄 Sistema de Recategorización</h1>
         `;
     }
 
@@ -656,12 +656,12 @@ class GestorRecibos {
         return `
             <div class="controls" style="display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; margin-bottom: 12px;">
                 <input type="text" id="legajoInputRecategorizacion" placeholder="Ingresar legajo..." 
-                    style="padding: 10px; border: 2px solid #e1e1e1; border-radius: 5px; font-size: 16px; min-width: 180px;">
+                    style="padding: 10px; border: 2px solid var(--border); border-radius: 5px; font-size: 16px; min-width: 180px;">
                 <button id="buscarBtnRecategorizacion" 
-                    style="padding: 10px 16px; background: linear-gradient(135deg, #4a4f4eff 0%, #070707ff 100%); color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold;">
+                    style="padding: 10px 16px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold;">
                     🔍 Buscar
                 </button>
-                <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: var(--neutral); color: var(--primary-contrast); border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
                     ⬅️ Volver al Menú Principal
                 </button>
             </div>
@@ -717,7 +717,7 @@ class GestorRecibos {
 
             if (!coincidencia) {
                 this.contenedorRecibos.innerHTML = `
-                    <div style="text-align: center; color: #e74c3c; font-size: 16px; padding: 24px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+                    <div style="text-align: center; color: var(--error); font-size: 16px; padding: 24px; background: var(--surface); border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
                         ❌ No se encontró un registro para el legajo ${legajo}${isSuperAdmin ? '' : ' en su dependencia'}.
                     </div>
                 `;
@@ -743,31 +743,31 @@ class GestorRecibos {
             this.recategorizacionDatos = { legajo: colA, nombre: colB, categoriaActual: colC };
 
             this.contenedorRecibos.innerHTML = `
-                <div class="recategorizacion-card" style="background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden;">
-                    <div style="background: linear-gradient(135deg, #4a4f4eff 0%, #070707ff 100%); color: white; padding: 14px 18px; font-weight: bold; display:flex; justify-content:space-between; align-items:center;">
+                <div class="recategorizacion-card" style="background: var(--surface); border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 14px 18px; font-weight: bold; display:flex; justify-content:space-between; align-items:center;">
                         <span>🔎 Resultado de Búsqueda</span>
                         <span>Legajo: ${colA}</span>
                     </div>
                     <div style="padding: 16px;">
                         <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f0f0f0;">
                             <div style="font-weight:bold; color:#555;">Nombre Completo:</div>
-                            <div style="color:#333;">${colB}</div>
+                            <div style="color: var(--text);">${colB}</div>
                         </div>
                         <div style="display:flex; justify-content:space-between; padding:8px 0;">
                             <div style="font-weight:bold; color:#555;">Categoria Actual:</div>
-                            <div style="color:#333;">${colC}</div>
+                            <div style="color: var(--text);">${colC}</div>
                         </div>
                         <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:8px 0;">
                             <div style="font-weight:bold; color:#555;">Categoria Solicitada:</div>
                             <div style="flex:1; text-align:right;">
-                                <select id="categoriaSolicitadaSelect" style="min-width:220px; padding:8px 10px; border:2px solid #e1e1e1; border-radius:6px; font-size:14px;">
+                                <select id="categoriaSolicitadaSelect" style="min-width:220px; padding:8px 10px; border:2px solid var(--border); border-radius:6px; font-size:14px;">
                                     ${opcionesCategorias}
                                 </select>
                             </div>
                         </div>
                         <div style="text-align:right; margin-top:12px;">
                             <button id="solicitarRecategorizacionBtn" onclick="gestorRecibos.solicitarRecategorizacion()" 
-                                style="padding: 10px 16px; background: linear-gradient(135deg, #4a4f4eff 0%, #070707ff 100%); color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold;">
+                                style="padding: 10px 16px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold;">
                                 📝 Solicitar Recategorización
                             </button>
                         </div>
@@ -779,7 +779,7 @@ class GestorRecibos {
         } catch (error) {
             console.error('Error buscando legajo en Personal Activo:', error);
             this.contenedorRecibos.innerHTML = `
-                <div style="text-align: center; color: #e74c3c; font-size: 16px; padding: 24px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+                <div style="text-align: center; color: var(--error); font-size: 16px; padding: 24px; background: var(--surface); border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
                     ❌ Ocurrió un error al buscar el legajo. Intente nuevamente.
                 </div>
             `;
@@ -865,12 +865,12 @@ class GestorRecibos {
     obtenerHTMLVacaciones() {
         return `
             <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-                <div class="header" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                <div class="header" style="background: var(--surface); padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
                     ${this.obtenerHTMLHeaderVacaciones()}
                     ${this.obtenerHTMLControlesVacaciones()}
                     
                     <div style="text-align: center; margin-top: 20px;">
-                        <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                        <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: var(--neutral); color: var(--primary-contrast); border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
                             ⬅️ Volver al Menú Principal
                         </button>
                     </div>
@@ -887,7 +887,7 @@ class GestorRecibos {
 
     obtenerHTMLHeaderVacaciones() {
         return `
-            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
+            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
                 <div>
                     <strong>👤 ${this.usuarioActual.username}</strong>
                     <br>
@@ -898,24 +898,24 @@ class GestorRecibos {
                 </button>
             </div>
             
-            <h1 style="text-align: center; color: #333; margin-bottom: 20px;">🏖️ Sistema de Gestión de Vacaciones</h1>
+            <h1 style="text-align: center; color: var(--text); margin-bottom: 20px;">🏖️ Sistema de Gestión de Vacaciones</h1>
         `;
     }
 
     obtenerHTMLControlesVacaciones() {
         return `
             <div class="controls" style="display: flex; gap: 15px; align-items: center; justify-content: center; flex-wrap: wrap;">
-                <select id="dependenciaSelectVacaciones" style="padding: 10px; border: 2px solid #e1e1e1; border-radius: 5px; font-size: 16px; min-width: 200px;">
+                <select id="dependenciaSelectVacaciones" style="padding: 10px; border: 2px solid var(--border); border-radius: 5px; font-size: 16px; min-width: 200px;">
                     <option value="">Selecciona una dependencia</option>
                 </select>
                 
-                <input type="text" id="legajoInputVacaciones" placeholder="Filtrar por legajo..." style="padding: 10px; border: 2px solid #e1e1e1; border-radius: 5px; font-size: 16px; min-width: 150px;">
+                <input type="text" id="legajoInputVacaciones" placeholder="Filtrar por legajo..." style="padding: 10px; border: 2px solid var(--border); border-radius: 5px; font-size: 16px; min-width: 150px;">
                 
-                <button id="loadBtnVacaciones" style="padding: 10px 20px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;">
+                <button id="loadBtnVacaciones" style="padding: 10px 20px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;">
                     🏖️ Cargar Vacaciones
                 </button>
                 
-                <button id="clearBtnVacaciones" style="padding: 10px 15px; background: #6c757d; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+                <button id="clearBtnVacaciones" style="padding: 10px 15px; background: var(--neutral); color: var(--primary-contrast); border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
                     🗑️ Limpiar
                 </button>
             </div>
@@ -1074,7 +1074,7 @@ class GestorRecibos {
         const tarjeta = document.createElement('div');
         tarjeta.className = 'vacacion-card';
         tarjeta.style.cssText = `
-            background: white;
+            background: var(--surface);
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             margin-bottom: 20px;
@@ -1092,7 +1092,7 @@ class GestorRecibos {
         const legajo = vacacion[0] || 'N/A';
         const nombre = vacacion[1] || 'N/A';
         return `
-            <div class="vacacion-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div class="vacacion-header" style="background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
                 <div style="font-size: 18px; font-weight: bold;">
                     🏖️ Vacación #${indice + 1} - ${nombre} (Legajo: ${legajo})
                 </div>
@@ -1109,7 +1109,7 @@ class GestorRecibos {
                 return `
                     <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
                         <div style="font-weight: bold; color: #555; flex: 1;">${encabezado}:</div>
-                        <div style="color: #333; flex: 2; text-align: right;">${vacacion[i] || 'N/A'}</div>
+                        <div style="color: var(--text); flex: 2; text-align: right;">${vacacion[i] || 'N/A'}</div>
                     </div>
                 `;
             })
@@ -1122,7 +1122,7 @@ class GestorRecibos {
 
     mostrarErrorVacaciones(mensaje) {
         this.contenedorVacaciones.innerHTML = `
-            <div style="text-align: center; color: #e74c3c; font-size: 18px; padding: 40px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="text-align: center; color: var(--error); font-size: 18px; padding: 40px; background: var(--surface); border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
                 ❌ ${mensaje}
             </div>
         `;
@@ -1139,12 +1139,12 @@ class GestorRecibos {
     obtenerHTMLBajas() {
         return `
             <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-                <div class="header" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                <div class="header" style="background: var(--surface); padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
                     ${this.obtenerHTMLHeaderBajas()}
                     ${this.obtenerHTMLControlesBajas()}
                     
                     <div style="text-align: center; margin-top: 20px;">
-                        <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                        <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: var(--neutral); color: var(--primary-contrast); border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
                             ⬅️ Volver al Menú Principal
                         </button>
                     </div>
@@ -1161,7 +1161,7 @@ class GestorRecibos {
 
     obtenerHTMLHeaderBajas() {
         return `
-            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
+            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
                 <div>
                     <strong>👤 ${this.usuarioActual.username}</strong>
                     <br>
@@ -1172,24 +1172,24 @@ class GestorRecibos {
                 </button>
             </div>
             
-            <h1 style="text-align: center; color: #333; margin-bottom: 20px;">⚠️ Sistema de Gestión de Bajas Sin Cubrir</h1>
+            <h1 style="text-align: center; color: var(--text); margin-bottom: 20px;">⚠️ Sistema de Gestión de Bajas Sin Cubrir</h1>
         `;
     }
 
     obtenerHTMLControlesBajas() {
         return `
             <div class="controls" style="display: flex; gap: 15px; align-items: center; justify-content: center; flex-wrap: wrap;">
-                <select id="dependenciaSelectBajas" style="padding: 10px; border: 2px solid #e1e1e1; border-radius: 5px; font-size: 16px; min-width: 200px;">
+                <select id="dependenciaSelectBajas" style="padding: 10px; border: 2px solid var(--border); border-radius: 5px; font-size: 16px; min-width: 200px;">
                     <option value="">Selecciona una dependencia</option>
                 </select>
                 
-                <input type="text" id="legajoInputBajas" placeholder="Filtrar por legajo..." style="padding: 10px; border: 2px solid #e1e1e1; border-radius: 5px; font-size: 16px; min-width: 150px;">
+                <input type="text" id="legajoInputBajas" placeholder="Filtrar por legajo..." style="padding: 10px; border: 2px solid var(--border); border-radius: 5px; font-size: 16px; min-width: 150px;">
                 
-                <button id="loadBtnBajas" style="padding: 10px 20px; background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%); color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;">
+                <button id="loadBtnBajas" style="padding: 10px 20px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;">
                     ⚠️ Cargar Bajas
                 </button>
                 
-                <button id="clearBtnBajas" style="padding: 10px 15px; background: #6c757d; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+                <button id="clearBtnBajas" style="padding: 10px 15px; background: var(--neutral); color: var(--primary-contrast); border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
                     🗑️ Limpiar
                 </button>
             </div>
@@ -1347,7 +1347,7 @@ class GestorRecibos {
         const tarjeta = document.createElement('div');
         tarjeta.className = 'baja-card';
         tarjeta.style.cssText = `
-            background: white;
+            background: var(--surface);
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             margin-bottom: 20px;
@@ -1365,7 +1365,7 @@ class GestorRecibos {
         const legajo = baja[0] || 'N/A';
         const nombre = baja[1] || 'N/A';
         return `
-            <div class="baja-header" style="background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div class="baja-header" style="background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
                 <div style="font-size: 18px; font-weight: bold;">
                     ⚠️ Baja Sin Cubrir #${indice + 1} - ${nombre} (Legajo: ${legajo})
                 </div>
@@ -1382,7 +1382,7 @@ class GestorRecibos {
                 return `
                     <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
                         <div style="font-weight: bold; color: #555; flex: 1;">${encabezado}:</div>
-                        <div style="color: #333; flex: 2; text-align: right;">${baja[i] || 'N/A'}</div>
+                        <div style="color: var(--text); flex: 2; text-align: right;">${baja[i] || 'N/A'}</div>
                     </div>
                 `;
             })
@@ -1395,7 +1395,7 @@ class GestorRecibos {
 
     mostrarErrorBajas(mensaje) {
         this.contenedorBajas.innerHTML = `
-            <div style="text-align: center; color: #e74c3c; font-size: 18px; padding: 40px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="text-align: center; color: var(--error); font-size: 18px; padding: 40px; background: var(--surface); border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
                 ❌ ${mensaje}
             </div>
         `;
@@ -1412,12 +1412,12 @@ class GestorRecibos {
     obtenerHTMLPersonalActivo() {
         return `
             <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-                <div class="header" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                <div class="header" style="background: var(--surface); padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
                     ${this.obtenerHTMLHeaderPersonalActivo()}
                     ${this.obtenerHTMLControlesPersonalActivo()}
                     
                     <div style="text-align: center; margin-top: 20px;">
-                        <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                        <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: var(--neutral); color: var(--primary-contrast); border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
                             ⬅️ Volver al Menú Principal
                         </button>
                     </div>
@@ -1434,7 +1434,7 @@ class GestorRecibos {
 
     obtenerHTMLHeaderPersonalActivo() {
         return `
-            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
+            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
                 <div>
                     <strong>👤 ${this.usuarioActual.username}</strong>
                     <br>
@@ -1445,24 +1445,24 @@ class GestorRecibos {
                 </button>
             </div>
             
-            <h1 style="text-align: center; color: #333; margin-bottom: 20px;">👥 Sistema de Gestión de Personal Activo</h1>
+            <h1 style="text-align: center; color: var(--text); margin-bottom: 20px;">👥 Sistema de Gestión de Personal Activo</h1>
         `;
     }
 
     obtenerHTMLControlesPersonalActivo() {
         return `
             <div class="controls" style="display: flex; gap: 15px; align-items: center; justify-content: center; flex-wrap: wrap;">
-                <select id="dependenciaSelectPersonalActivo" style="padding: 10px; border: 2px solid #e1e1e1; border-radius: 5px; font-size: 16px; min-width: 200px;">
+                <select id="dependenciaSelectPersonalActivo" style="padding: 10px; border: 2px solid var(--border); border-radius: 5px; font-size: 16px; min-width: 200px;">
                     <option value="">Selecciona una dependencia</option>
                 </select>
                 
-                <input type="text" id="legajoInputPersonalActivo" placeholder="Filtrar por legajo..." style="padding: 10px; border: 2px solid #e1e1e1; border-radius: 5px; font-size: 16px; min-width: 150px;">
+                <input type="text" id="legajoInputPersonalActivo" placeholder="Filtrar por legajo..." style="padding: 10px; border: 2px solid var(--border); border-radius: 5px; font-size: 16px; min-width: 150px;">
                 
-                <button id="loadBtnPersonalActivo" style="padding: 10px 20px; background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%); color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;">
+                <button id="loadBtnPersonalActivo" style="padding: 10px 20px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;">
                     👥 Cargar Personal
                 </button>
                 
-                <button id="clearBtnPersonalActivo" style="padding: 10px 15px; background: #6c757d; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+                <button id="clearBtnPersonalActivo" style="padding: 10px 15px; background: var(--neutral); color: var(--primary-contrast); border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
                     🗑️ Limpiar
                 </button>
             </div>
@@ -1619,7 +1619,7 @@ class GestorRecibos {
         const tarjeta = document.createElement('div');
         tarjeta.className = 'personal-activo-card';
         tarjeta.style.cssText = `
-            background: white;
+            background: var(--surface);
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             margin-bottom: 20px;
@@ -1647,7 +1647,7 @@ class GestorRecibos {
         }
 
         return `
-            <div class="personal-activo-header" style="background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div class="personal-activo-header" style="background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
                 <div style="font-size: 18px; font-weight: bold;">
                     👥 ${nombre} (Legajo: ${legajo})
                 </div>
@@ -1678,7 +1678,7 @@ class GestorRecibos {
                 return `
                     <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
                         <div style="font-weight: bold; color: #555; flex: 1;">${encabezado}:</div>
-                        <div style="color: #333; flex: 2; text-align: right;">${valor}</div>
+                        <div style="color: var(--text); flex: 2; text-align: right;">${valor}</div>
                     </div>
                 `;
             })
@@ -1691,7 +1691,7 @@ class GestorRecibos {
 
     mostrarErrorPersonalActivo(mensaje) {
         this.contenedorPersonalActivo.innerHTML = `
-            <div style="text-align: center; color: #e74c3c; font-size: 18px; padding: 40px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="text-align: center; color: var(--error); font-size: 18px; padding: 40px; background: var(--surface); border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
                 ❌ ${mensaje}
             </div>
         `;
@@ -1708,17 +1708,17 @@ class GestorRecibos {
     obtenerHTMLAccidentes() {
         return `
             <div class="container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
-                <div class="header" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                <div class="header" style="background: var(--surface); padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
                     ${this.obtenerHTMLHeaderAccidentes()}
                     
                     <div style="text-align: center; margin-bottom: 20px;">
-                        <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                        <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: var(--neutral); color: var(--primary-contrast); border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
                             ⬅️ Volver al Menú Principal
                         </button>
                     </div>
                 </div>
                 
-                <div class="form-container" style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <div class="form-container" style="background: var(--surface); padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
                     ${this.obtenerHTMLFormularioAccidente()}
                 </div>
                 
@@ -1729,7 +1729,7 @@ class GestorRecibos {
 
     obtenerHTMLHeaderAccidentes() {
         return `
-            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
+            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
                 <div>
                     <strong>👤 ${this.usuarioActual.username}</strong>
                     <br>
@@ -1740,7 +1740,7 @@ class GestorRecibos {
                 </button>
             </div>
             
-            <h1 style="text-align: center; color: #333; margin-bottom: 20px;">🚨 Registro de Accidentes Laborales</h1>
+            <h1 style="text-align: center; color: var(--text); margin-bottom: 20px;">🚨 Registro de Accidentes Laborales</h1>
         `;
     }
 
@@ -1750,77 +1750,77 @@ class GestorRecibos {
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                     <div>
                         <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
-                            <span style="color: #e74c3c;">*</span> Número de Legajo:
+                            <span style="color: var(--error);">*</span> Número de Legajo:
                         </label>
                         <input type="text" id="legajoAccidente" required 
-                               style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                               style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box;"
                                placeholder="Ej: 12345">
                     </div>
                     
                     <div>
                         <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
-                            <span style="color: #e74c3c;">*</span> Nombre del Accidentado:
+                            <span style="color: var(--error);">*</span> Nombre del Accidentado:
                         </label>
                         <input type="text" id="nombreAccidente" required 
-                               style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                               style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box;"
                                placeholder="Ej: Juan Carlos">
                     </div>
                 </div>
 
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
-                        <span style="color: #e74c3c;">*</span> Apellido del Accidentado:
+                        <span style="color: var(--error);">*</span> Apellido del Accidentado:
                     </label>
                     <input type="text" id="apellidoAccidente" required 
-                           style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                           style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box;"
                            placeholder="Ej: González Pérez">
                 </div>
 
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
-                        <span style="color: #e74c3c;">*</span> Detalle del Accidente:
+                        <span style="color: var(--error);">*</span> Detalle del Accidente:
                     </label>
                     <textarea id="detalleAccidente" required rows="4"
-                              style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; resize: vertical; box-sizing: border-box;"
+                              style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; resize: vertical; box-sizing: border-box;"
                               placeholder="Describa lo sucedido..."></textarea>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                     <div>
                         <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
-                            <span style="color: #e74c3c;">*</span> Fecha del Accidente:
+                            <span style="color: var(--error);">*</span> Fecha del Accidente:
                         </label>
                         <input type="date" id="fechaAccidente" required 
-                               style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                               style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box;">
                     </div>
                     
                     <div>
                         <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
-                            <span style="color: #e74c3c;">*</span> Hora del Accidente:
+                            <span style="color: var(--error);">*</span> Hora del Accidente:
                         </label>
                         <input type="time" id="horaAccidente" required 
-                               style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                               style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box;">
                     </div>
                 </div>
 
                 <div style="margin-bottom: 30px;">
                     <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
-                        <span style="color: #e74c3c;">*</span> Administrador que Carga el Reclamo:
+                        <span style="color: var(--error);">*</span> Administrador que Carga el Reclamo:
                     </label>
                     <input type="text" id="administradorAccidente" required
-                           style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                           style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box;"
                            placeholder="Ingrese nombre y apellido del administrador...">
                 </div>
 
                 <div style="text-align: center;">
                     <button type="submit" id="guardarAccidente" 
-                            style="padding: 15px 30px; background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%); color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s;">
+                            style="padding: 15px 30px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s;">
                         🚨 Registrar Accidente
                     </button>
                 </div>
 
                 <div style="margin-top: 20px; padding: 15px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; color: #856404;">
-                    <strong>📝 Nota importante:</strong> Los campos marcados con <span style="color: #e74c3c;">*</span> son obligatorios. 
+                    <strong>📝 Nota importante:</strong> Los campos marcados con <span style="color: var(--error);">*</span> son obligatorios. 
                     Asegúrese de completar toda la información requerida antes de enviar el formulario.
                 </div>
             </form>
@@ -1873,7 +1873,7 @@ class GestorRecibos {
 
         this.botonGuardarAccidente.disabled = true;
         this.botonGuardarAccidente.textContent = '⏳ Guardando...';
-        this.botonGuardarAccidente.style.background = '#6c757d';
+    this.botonGuardarAccidente.style.background = 'var(--neutral)';
 
         try {
             const datosAccidente = this.recopilarDatosAccidente();
@@ -2016,7 +2016,7 @@ class GestorRecibos {
     restaurarBotonGuardar() {
         this.botonGuardarAccidente.disabled = false;
         this.botonGuardarAccidente.textContent = '🚨 Registrar Accidente';
-        this.botonGuardarAccidente.style.background = 'linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%)';
+    this.botonGuardarAccidente.style.background = 'linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%)';
     }
 
     // MÓDULO DE MEDICINA LABORAL
@@ -2030,17 +2030,17 @@ class GestorRecibos {
     obtenerHTMLMedicinaLaboral() {
         return `
             <div class="container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
-                <div class="header" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                <div class="header" style="background: var(--surface); padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
                     ${this.obtenerHTMLHeaderMedicinaLaboral()}
                     
                     <div style="text-align: center; margin-bottom: 20px;">
-                        <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                        <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: var(--neutral); color: var(--primary-contrast); border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
                             ⬅️ Volver al Menú Principal
                         </button>
                     </div>
                 </div>
                 
-                <div class="form-container" style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <div class="form-container" style="background: var(--surface); padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
                     ${this.obtenerHTMLFormularioMedicinaLaboral()}
                 </div>
                 
@@ -2051,7 +2051,7 @@ class GestorRecibos {
 
     obtenerHTMLHeaderMedicinaLaboral() {
         return `
-            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #1427fdff 0%, #e83e8c 100%); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
+            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
                 <div>
                     <strong>👤 ${this.usuarioActual.username}</strong>
                     <br>
@@ -2062,7 +2062,7 @@ class GestorRecibos {
                 </button>
             </div>
             
-            <h1 style="text-align: center; color: #333; margin-bottom: 20px;">🏥 Registro de Medicina Laboral</h1>
+            <h1 style="text-align: center; color: var(--text); margin-bottom: 20px;">🏥 Registro de Medicina Laboral</h1>
         `;
     }
 
@@ -2072,43 +2072,43 @@ class GestorRecibos {
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                     <div>
                         <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
-                            <span style="color: #e74c3c;">*</span> Número de Legajo:
+                            <span style="color: var(--error);">*</span> Número de Legajo:
                         </label>
                         <input type="text" id="legajoMedicinaLaboral" required 
-                               style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                               style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box;"
                                placeholder="Ej: 12345">
                     </div>
                     
                     <div>
                         <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
-                            <span style="color: #e74c3c;">*</span> Nombre:
+                            <span style="color: var(--error);">*</span> Nombre:
                         </label>
                         <input type="text" id="nombreMedicinaLaboral" required 
-                               style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                               style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box;"
                                placeholder="Ej: Juan Carlos">
                     </div>
                 </div>
 
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
-                        <span style="color: #e74c3c;">*</span> Apellido:
+                        <span style="color: var(--error);">*</span> Apellido:
                     </label>
                     <input type="text" id="apellidoMedicinaLaboral" required 
-                           style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                           style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box;"
                            placeholder="Ej: González Pérez">
                 </div>
 
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
-                        <span style="color: #e74c3c;">*</span> Fecha del Certificado Médico:
+                        <span style="color: var(--error);">*</span> Fecha del Certificado Médico:
                     </label>
                     <input type="date" id="fechaCertificadoMedicinaLaboral" required 
-                           style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                           style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box;">
                 </div>
 
                 <div style="margin-bottom: 12px;">
                     <label style="display: block; color: #555; font-weight: bold; margin-bottom: 8px;">
-                        <span style="color: #e74c3c;">*</span> Tipo de Registro:
+                        <span style="color: var(--error);">*</span> Tipo de Registro:
                     </label>
                     <div style="display:flex; gap:16px; align-items:center;">
                         <label style="display:flex; gap:8px; align-items:center;">
@@ -2124,59 +2124,59 @@ class GestorRecibos {
 
                 <div id="campoDiasML" style="margin-bottom: 20px;">
                     <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
-                        <span style="color: #e74c3c;">*</span> Cantidad de Días:
+                        <span style="color: var(--error);">*</span> Cantidad de Días:
                     </label>
                     <input type="number" id="cantidadDiasMedicinaLaboral" min="1" required
-                           style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                           style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box;"
                            placeholder="Ej: 7">
                 </div>
 
                 <div id="campoHorasML" style="margin-bottom: 20px; display: none;">
                     <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
-                        <span style="color: #e74c3c;">*</span> Cantidad de Horas:
+                        <span style="color: var(--error);">*</span> Cantidad de Horas:
                     </label>
                     <input type="number" id="cantidadHorasMedicinaLaboral" min="1" step="0.5"
-                           style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                           style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box;"
                            placeholder="Ej: 4">
                     <small style="color: #666; font-size: 14px;">Puede usar medios puntos (ej. 3.5)</small>
                 </div>
 
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
-                        <span style="color: #e74c3c;">*</span> Diagnóstico:
+                        <span style="color: var(--error);">*</span> Diagnóstico:
                     </label>
                     <textarea id="diagnosticoMedicinaLaboral" required rows="4"
-                              style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; resize: vertical; box-sizing: border-box;"
+                              style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; resize: vertical; box-sizing: border-box;"
                               placeholder="Describa el diagnóstico médico..."></textarea>
                 </div>
 
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
-                        <span style="color: #e74c3c;">*</span> Archivo Adjunto:
+                        <span style="color: var(--error);">*</span> Archivo Adjunto:
                     </label>
                     <input type="file" id="archivoAdjMedicinaLaboral" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required
-                           style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                           style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box;">
                     <small style="color: #666; font-size: 14px;">Formatos permitidos: PDF, JPG, PNG, DOC, DOCX</small>
                 </div>
 
                 <div style="margin-bottom: 30px;">
                     <label style="display: block; color: #555; font-weight: bold; margin-bottom: 5px;">
-                        <span style="color: #e74c3c;">*</span> Administrador que Carga el Registro:
+                        <span style="color: var(--error);">*</span> Administrador que Carga el Registro:
                     </label>
                     <input type="text" id="administradorMedicinaLaboral" required
-                           style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+                           style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box;"
                            placeholder="Ingrese nombre y apellido del administrador...">
                 </div>
 
                 <div style="text-align: center;">
                     <button type="submit" id="guardarMedicinaLaboral" 
-                            style="padding: 15px 30px; background: linear-gradient(135deg, #1427fdff 0%, #e83e8c 100%); color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s;">
+                            style="padding: 15px 30px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s;">
                         🏥 Registrar Medicina Laboral
                     </button>
                 </div>
 
                 <div style="margin-top: 20px; padding: 15px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; color: #856404;">
-                    <strong>📝 Nota importante:</strong> Los campos marcados con <span style="color: #e74c3c;">*</span> son obligatorios. 
+                    <strong>📝 Nota importante:</strong> Los campos marcados con <span style="color: var(--error);">*</span> son obligatorios. 
                     Asegúrese de completar toda la información requerida antes de enviar el formulario.
                 </div>
             </form>
@@ -2251,7 +2251,7 @@ class GestorRecibos {
 
         this.botonGuardarMedicinaLaboral.disabled = true;
         this.botonGuardarMedicinaLaboral.textContent = '⏳ Subiendo archivo y guardando...'; // Mensaje más claro
-        this.botonGuardarMedicinaLaboral.style.background = '#6c757d';
+    this.botonGuardarMedicinaLaboral.style.background = 'var(--neutral)';
 
         try {
             let datosMedicinaLaboral = this.recopilarDatosMedicinaLaboral();
@@ -2457,7 +2457,7 @@ class GestorRecibos {
     restaurarBotonGuardarMedicinaLaboral() {
         this.botonGuardarMedicinaLaboral.disabled = false;
         this.botonGuardarMedicinaLaboral.textContent = '🏥 Registrar Medicina Laboral';
-        this.botonGuardarMedicinaLaboral.style.background = 'linear-gradient(135deg, #1427fdff 0%, #e83e8c 100%)';
+    this.botonGuardarMedicinaLaboral.style.background = 'linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%)';
     }
 }
 
