@@ -14,6 +14,10 @@ class GestorRecibos {
         this.usuarios = {};
         this.usuarioActual = null;
 
+    // Cache simple para respuestas de Google Sheets (TTL 5 minutos)
+    this._cache = new Map();
+    this._cacheTTL = 5 * 60 * 1000;
+
         // Variables para recibos
         this.recibosFiltrados = [];
         this.todosLosRecibos = [];
@@ -285,6 +289,31 @@ class GestorRecibos {
         });
     }
 
+    // Utilidades
+    debounce(fn, delay = 250) {
+        let t;
+        return (...args) => {
+            clearTimeout(t);
+            t = setTimeout(() => fn.apply(this, args), delay);
+        };
+    }
+
+    getUserHeaderHTML(tituloConIcono) {
+        return `
+            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
+                <div>
+                    <strong>👤 ${this.usuarioActual.username}</strong>
+                    <br>
+                    <small>${this.usuarioActual.dependencia || 'Super Administrador'}</small>
+                </div>
+                <button onclick="gestorRecibos.cerrarSesion()" style="background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 5px; cursor: pointer;">
+                    🚪 Cerrar Sesión
+                </button>
+            </div>
+            <h1 style="text-align: center; color: var(--text); margin-bottom: 20px;">${tituloConIcono}</h1>
+        `;
+    }
+
     mostrarModuloRecibos() {
         document.body.innerHTML = this.obtenerHTMLInterfaz();
         this.inicializarReferenciasDOM();
@@ -316,20 +345,7 @@ class GestorRecibos {
     }
 
     obtenerHTMLHeader() {
-        return `
-            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
-                <div>
-                    <strong>👤 ${this.usuarioActual.username}</strong>
-                    <br>
-                    <small>${this.usuarioActual.dependencia || 'Super Administrador'}</small>
-                </div>
-                <button onclick="gestorRecibos.cerrarSesion()" style="background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 5px; cursor: pointer;">
-                    🚪 Cerrar Sesión
-                </button>
-            </div>
-            
-            <h1 style="text-align: center; color: var(--text); margin-bottom: 20px;">📋 Sistema de Gestión de Recibos</h1>
-        `;
+    return this.getUserHeaderHTML('📋 Sistema de Gestión de Recibos');
     }
 
     obtenerHTMLControles() {
@@ -362,7 +378,7 @@ class GestorRecibos {
 
     configurarEventos() {
         this.botonCargar.addEventListener('click', () => this.cargarRecibos());
-        this.inputLegajo.addEventListener('input', () => this.filtrarPorLegajo());
+    this.inputLegajo.addEventListener('input', this.debounce(() => this.filtrarPorLegajo(), 200));
         document.getElementById('clearBtn').addEventListener('click', () => this.limpiarFiltros());
     }
 
@@ -412,14 +428,30 @@ class GestorRecibos {
     }
 
     async obtenerDatosHoja(rango) {
+        const key = String(rango);
+        const ahora = Date.now();
+        const cacheEntry = this._cache.get(key);
+        if (cacheEntry && (ahora - cacheEntry.t) < this._cacheTTL) {
+            return cacheEntry.data;
+        }
+
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.ID_HOJA}/values/${rango}?key=${this.CLAVE_API}`;
-        const respuesta = await fetch(url);
+        const ctrl = new AbortController();
+        const timeout = setTimeout(() => ctrl.abort(), 15000);
+        let respuesta;
+        try {
+            respuesta = await fetch(url, { signal: ctrl.signal });
+        } finally {
+            clearTimeout(timeout);
+        }
 
         if (!respuesta.ok) {
             throw new Error(`Error: ${respuesta.status}`);
         }
 
-        return await respuesta.json();
+        const data = await respuesta.json();
+        this._cache.set(key, { t: ahora, data });
+        return data;
     }
 
     async cargarRecibos() {
@@ -516,10 +548,12 @@ class GestorRecibos {
     }
 
     renderizarRecibos(recibos, encabezados) {
+        const frag = document.createDocumentFragment();
         recibos.forEach((recibo, indice) => {
             const tarjetaRecibo = this.crearTarjetaRecibo(recibo, encabezados, indice);
-            this.contenedorRecibos.appendChild(tarjetaRecibo);
+            frag.appendChild(tarjetaRecibo);
         });
+        this.contenedorRecibos.appendChild(frag);
     }
 
     crearTarjetaRecibo(recibo, encabezados, indice) {
@@ -636,20 +670,7 @@ class GestorRecibos {
     }
 
     obtenerHTMLHeaderRecategorizacion() {
-        return `
-            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
-                <div>
-                    <strong>👤 ${this.usuarioActual.username}</strong>
-                    <br>
-                    <small>${this.usuarioActual.dependencia || 'Super Administrador'}</small>
-                </div>
-                <button onclick="gestorRecibos.cerrarSesion()" style="background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 5px; cursor: pointer;">
-                    🚪 Cerrar Sesión
-                </button>
-            </div>
-
-            <h1 style="text-align: center; color: var(--text); margin-bottom: 20px;">🔄 Sistema de Recategorización</h1>
-        `;
+        return this.getUserHeaderHTML('🔄 Sistema de Recategorización');
     }
 
     obtenerHTMLControlesRecategorizacion() {
@@ -886,20 +907,7 @@ class GestorRecibos {
     }
 
     obtenerHTMLHeaderVacaciones() {
-        return `
-            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
-                <div>
-                    <strong>👤 ${this.usuarioActual.username}</strong>
-                    <br>
-                    <small>${this.usuarioActual.dependencia || 'Super Administrador'}</small>
-                </div>
-                <button onclick="gestorRecibos.cerrarSesion()" style="background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 5px; cursor: pointer;">
-                    🚪 Cerrar Sesión
-                </button>
-            </div>
-            
-            <h1 style="text-align: center; color: var(--text); margin-bottom: 20px;">🏖️ Sistema de Gestión de Vacaciones</h1>
-        `;
+        return this.getUserHeaderHTML('🏖️ Sistema de Gestión de Vacaciones');
     }
 
     obtenerHTMLControlesVacaciones() {
@@ -932,7 +940,7 @@ class GestorRecibos {
 
     configurarEventosVacaciones() {
         this.botonCargarVacaciones.addEventListener('click', () => this.cargarVacaciones());
-        this.inputLegajoVacaciones.addEventListener('input', () => this.filtrarPorLegajoVacaciones());
+    this.inputLegajoVacaciones.addEventListener('input', this.debounce(() => this.filtrarPorLegajoVacaciones(), 200));
         document.getElementById('clearBtnVacaciones').addEventListener('click', () => this.limpiarFiltrosVacaciones());
     }
 
@@ -1064,10 +1072,12 @@ class GestorRecibos {
     }
 
     renderizarVacaciones(vacaciones, encabezados) {
+        const frag = document.createDocumentFragment();
         vacaciones.forEach((vacacion, indice) => {
             const tarjetaVacacion = this.crearTarjetaVacacion(vacacion, encabezados, indice);
-            this.contenedorVacaciones.appendChild(tarjetaVacacion);
+            frag.appendChild(tarjetaVacacion);
         });
+        this.contenedorVacaciones.appendChild(frag);
     }
 
     crearTarjetaVacacion(vacacion, encabezados, indice) {
@@ -1160,20 +1170,7 @@ class GestorRecibos {
     }
 
     obtenerHTMLHeaderBajas() {
-        return `
-            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
-                <div>
-                    <strong>👤 ${this.usuarioActual.username}</strong>
-                    <br>
-                    <small>${this.usuarioActual.dependencia || 'Super Administrador'}</small>
-                </div>
-                <button onclick="gestorRecibos.cerrarSesion()" style="background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 5px; cursor: pointer;">
-                    🚪 Cerrar Sesión
-                </button>
-            </div>
-            
-            <h1 style="text-align: center; color: var(--text); margin-bottom: 20px;">⚠️ Sistema de Gestión de Bajas Sin Cubrir</h1>
-        `;
+        return this.getUserHeaderHTML('⚠️ Sistema de Gestión de Bajas Sin Cubrir');
     }
 
     obtenerHTMLControlesBajas() {
@@ -1206,7 +1203,7 @@ class GestorRecibos {
 
     configurarEventosBajas() {
         this.botonCargarBajas.addEventListener('click', () => this.cargarBajas());
-        this.inputLegajoBajas.addEventListener('input', () => this.filtrarPorLegajoBajas());
+    this.inputLegajoBajas.addEventListener('input', this.debounce(() => this.filtrarPorLegajoBajas(), 200));
         document.getElementById('clearBtnBajas').addEventListener('click', () => this.limpiarFiltrosBajas());
     }
 
@@ -1337,10 +1334,12 @@ class GestorRecibos {
     }
 
     renderizarBajas(bajas, encabezados) {
+        const frag = document.createDocumentFragment();
         bajas.forEach((baja, indice) => {
             const tarjetaBaja = this.crearTarjetaBaja(baja, encabezados, indice);
-            this.contenedorBajas.appendChild(tarjetaBaja);
+            frag.appendChild(tarjetaBaja);
         });
+        this.contenedorBajas.appendChild(frag);
     }
 
     crearTarjetaBaja(baja, encabezados, indice) {
@@ -1433,20 +1432,7 @@ class GestorRecibos {
     }
 
     obtenerHTMLHeaderPersonalActivo() {
-        return `
-            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
-                <div>
-                    <strong>👤 ${this.usuarioActual.username}</strong>
-                    <br>
-                    <small>${this.usuarioActual.dependencia || 'Super Administrador'}</small>
-                </div>
-                <button onclick="gestorRecibos.cerrarSesion()" style="background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 5px; cursor: pointer;">
-                    🚪 Cerrar Sesión
-                </button>
-            </div>
-            
-            <h1 style="text-align: center; color: var(--text); margin-bottom: 20px;">👥 Sistema de Gestión de Personal Activo</h1>
-        `;
+        return this.getUserHeaderHTML('👥 Sistema de Gestión de Personal Activo');
     }
 
     obtenerHTMLControlesPersonalActivo() {
@@ -1479,7 +1465,7 @@ class GestorRecibos {
 
     configurarEventosPersonalActivo() {
         this.botonCargarPersonalActivo.addEventListener('click', () => this.cargarPersonalActivo());
-        this.inputLegajoPersonalActivo.addEventListener('input', () => this.filtrarPorLegajoPersonalActivo());
+    this.inputLegajoPersonalActivo.addEventListener('input', this.debounce(() => this.filtrarPorLegajoPersonalActivo(), 200));
         document.getElementById('clearBtnPersonalActivo').addEventListener('click', () => this.limpiarFiltrosPersonalActivo());
     }
 
@@ -1609,10 +1595,12 @@ class GestorRecibos {
     }
 
     renderizarPersonalActivo(personal, encabezados) {
+        const frag = document.createDocumentFragment();
         personal.forEach((persona, indice) => {
             const tarjetaPersona = this.crearTarjetaPersonalActivo(persona, encabezados, indice);
-            this.contenedorPersonalActivo.appendChild(tarjetaPersona);
+            frag.appendChild(tarjetaPersona);
         });
+        this.contenedorPersonalActivo.appendChild(frag);
     }
 
     crearTarjetaPersonalActivo(persona, encabezados, indice) {
@@ -1728,20 +1716,7 @@ class GestorRecibos {
     }
 
     obtenerHTMLHeaderAccidentes() {
-        return `
-            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
-                <div>
-                    <strong>👤 ${this.usuarioActual.username}</strong>
-                    <br>
-                    <small>${this.usuarioActual.dependencia || 'Super Administrador'}</small>
-                </div>
-                <button onclick="gestorRecibos.cerrarSesion()" style="background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 5px; cursor: pointer;">
-                    🚪 Cerrar Sesión
-                </button>
-            </div>
-            
-            <h1 style="text-align: center; color: var(--text); margin-bottom: 20px;">🚨 Registro de Accidentes Laborales</h1>
-        `;
+        return this.getUserHeaderHTML('🚨 Registro de Accidentes Laborales');
     }
 
     obtenerHTMLFormularioAccidente() {
@@ -2050,20 +2025,7 @@ class GestorRecibos {
     }
 
     obtenerHTMLHeaderMedicinaLaboral() {
-        return `
-            <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;">
-                <div>
-                    <strong>👤 ${this.usuarioActual.username}</strong>
-                    <br>
-                    <small>${this.usuarioActual.dependencia || 'Super Administrador'}</small>
-                </div>
-                <button onclick="gestorRecibos.cerrarSesion()" style="background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 5px; cursor: pointer;">
-                    🚪 Cerrar Sesión
-                </button>
-            </div>
-            
-            <h1 style="text-align: center; color: var(--text); margin-bottom: 20px;">🏥 Registro de Medicina Laboral</h1>
-        `;
+        return this.getUserHeaderHTML('🏥 Registro de Medicina Laboral');
     }
 
     obtenerHTMLFormularioMedicinaLaboral() {
@@ -2234,7 +2196,7 @@ class GestorRecibos {
     toggleTipoCantidadMedicinaLaboral() {
         const esDias = this.radioTipoDiasML.checked;
         this.campoDiasML.style.display = esDias ? 'block' : 'none';
-        this.campoHorasML.style.display = esDias ? 'none' : 'block'
+    this.campoHorasML.style.display = esDias ? 'none' : 'block';
         this.inputCantidadDiasMedicinaLaboral.required = esDias;
         this.inputCantidadHorasMedicinaLaboral.required = !esDias;
         if (esDias) {
