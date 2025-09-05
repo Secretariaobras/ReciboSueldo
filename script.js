@@ -85,7 +85,6 @@ class GestorRecibos {
 
         this.pdfLinks = [
             { href: 'pdfs/IOMA.pdf', label: 'IOMA', icon: '📄' },
-            { href: 'pdfs/modelo_nota.pdf', label: 'Modelo de Nota', icon: '📝' },
             { href: 'pdfs/Ordenanza - Temas importantes.pdf', label: 'Ordenanzas', icon: '📚' },
             { href: 'pdfs/NORMATIVAS VIGENTES DESDE 1-1-25 (002).pdf', label: 'Normativa Medicina Laboral', icon: '⚖️' },
         ];
