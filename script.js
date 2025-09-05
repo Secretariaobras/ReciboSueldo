@@ -86,8 +86,8 @@ class GestorRecibos {
         this.pdfLinks = [
             { href: 'pdfs/IOMA.pdf', label: 'IOMA', icon: '📄' },
             { href: 'pdfs/modelo_nota.pdf', label: 'Modelo de Nota', icon: '📝' },
-            { href: 'pdfs/ordenanzas.pdf', label: 'Ordenanzas', icon: '📚' },
-            { href: 'pdfs/normativa_medicina_laboral.pdf', label: 'Normativa Medicina Laboral', icon: '⚖️' },
+            { href: 'pdfs/Ordenanza - Temas importantes.pdf', label: 'Ordenanzas', icon: '📚' },
+            { href: 'pdfs/NORMATIVAS VIGENTES DESDE 1-1-25 (002).pdf', label: 'Normativa Medicina Laboral', icon: '⚖️' },
         ];
 
         this.inicializar();
@@ -997,7 +997,7 @@ class GestorRecibos {
         this.contenedorVacaciones.innerHTML = '';
 
         try {
-            const datos = await this.obtenerDatosHoja(`${this.HOJA_VACACIONES}!A:G`);
+            const datos = await this.obtenerDatosHoja(`${this.HOJA_VACACIONES}!A:F`);
 
             if (!datos.values || datos.values.length <= 1) {
                 this.mostrarErrorVacaciones('No se encontraron datos de vacaciones');
@@ -2212,7 +2212,7 @@ class GestorRecibos {
         }
 
         this.botonGuardarMedicinaLaboral.disabled = true;
-        this.botonGuardarMedicinaLaboral.textContent = '⏳ Subiendo archivo y guardando...'; // Mensaje más claro
+        this.botonGuardarMedicinaLaboral.textContent = '⏳ Subiendo archivo y guardando...';
     this.botonGuardarMedicinaLaboral.style.background = 'var(--neutral)';
 
         try {
