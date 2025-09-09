@@ -258,6 +258,9 @@ class GestorRecibos {
             <button onclick="gestorRecibos.mostrarModuloMedicinaLaboral()" class="menu-btn" style="background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; font-weight: bold;">
                             🏥<br>Medicina Laboral
                         </button>
+            <button onclick=gestorRecibos.mostrarModuloModelosNotas() class="menu-btn" style="background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; font-weight: bold;">
+                            📝<br>Modelos de Notas
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1397,6 +1400,163 @@ class GestorRecibos {
                 ❌ ${mensaje}
             </div>
         `;
+    }
+
+    //MODULO DE MODELOS DE NOTAS
+
+    mostrarModuloModelosNotas() {
+        document.body.innerHTML = this.obtenerHTMLModelosNotas();
+        this.inicializarReferenciasDOMModelosNotas();
+        this.configurarEventosModelosNotas();
+    }
+
+    obtenerHTMLModelosNotas() {
+        return `
+            <div class="container" style="max-width: 1000px; margin: 0 auto; padding: 20px;">
+                <div class="header" style="background: var(--surface); padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                    ${this.obtenerHTMLHeaderModelosNotas()}
+                    <div style="text-align: center; margin-top: 12px;">
+                        <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: var(--neutral); color: var(--primary-contrast); border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                            ⬅️ Volver al Menú Principal
+                        </button>
+                    </div>
+                </div>
+                <div id="modelosContainer" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:16px;"></div>
+            </div>
+        `;
+    }
+
+    obtenerHTMLHeaderModelosNotas() {
+        return this.getUserHeaderHTML('🗂️ Modelos de Notas');
+    }
+
+    inicializarReferenciasDOMModelosNotas() {
+        this.modelosContainer = document.getElementById('modelosContainer');
+        this.buscarModelosInput = document.getElementById('buscarModelosInput');
+        this.filtroTipoModelos = document.getElementById('filtroTipoModelos');
+        this.recargarModelosBtn = document.getElementById('recargarModelosBtn');
+        this._modelosLista = [];
+        this.cargarModelosDesdeManifest();
+    }
+
+    configurarEventosModelosNotas() {
+        if (this.buscarModelosInput) {
+            this.buscarModelosInput.addEventListener('input', this.debounce(() => this.aplicarFiltroModelos(), 200));
+        }
+        if (this.filtroTipoModelos) {
+            this.filtroTipoModelos.addEventListener('change', () => this.aplicarFiltroModelos());
+        }
+        if (this.recargarModelosBtn) {
+            this.recargarModelosBtn.addEventListener('click', () => this.cargarModelosDesdeManifest(true));
+        }
+    }
+
+    async cargarModelosDesdeManifest(force = false) {
+        try {
+            const url = 'pdfs/manifest.json';
+            const resp = await fetch(url + (force ? ('?t=' + Date.now()) : ''));
+            if (!resp.ok) throw new Error('No se pudo cargar manifest');
+            const lista = await resp.json();
+            this._modelosLista = Array.isArray(lista) ? lista : [];
+            this.aplicarFiltroModelos();
+        } catch (error) {
+            console.error('Error cargando manifest de modelos:', error);
+            this._modelosLista = this.pdfLinks || [];
+            this.aplicarFiltroModelos();
+        }
+    }
+
+    aplicarFiltroModelos() {
+        const termino = (this.buscarModelosInput?.value || '').toLowerCase();
+        const tipo = (this.filtroTipoModelos?.value || '').toLowerCase();
+
+        const filtrados = this._modelosLista.filter(item => {
+            const label = (item.label || '').toLowerCase();
+            const href = (item.href || '').toLowerCase();
+            const t = (item.type || '').toLowerCase() || href.split('.').pop();
+
+            const matchTerm = termino ? (label.includes(termino) || href.includes(termino)) : true;
+            const matchTipo = tipo ? (t === tipo) : true;
+            return matchTerm && matchTipo;
+        });
+
+        this.renderizarModelos(filtrados);
+    }
+
+    renderizarModelos(lista) {
+        if (!this.modelosContainer) return;
+        this.modelosContainer.innerHTML = '';
+
+        if (!lista || lista.length === 0) {
+            this.modelosContainer.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--error);">No se encontraron documentos.</div>`;
+            return;
+        }
+
+        const frag = document.createDocumentFragment();
+        lista.forEach((item, idx) => {
+            const card = document.createElement('div');
+            card.style.cssText = 'background:var(--surface); padding:12px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:8px;';
+
+            const title = document.createElement('div');
+            title.style.fontWeight = 'bold';
+            title.style.color = 'var(--text)';
+            title.textContent = item.label || item.href.split('/').pop();
+
+            const icon = document.createElement('div');
+            icon.textContent = item.type === 'pdf' ? '📄' : '📁';
+
+            const actions = document.createElement('div');
+            actions.style.display = 'flex';
+            actions.style.justifyContent = 'space-between';
+            actions.style.alignItems = 'center';
+
+            const isGoogleDoc = /https?:\/\/docs\.google\.com\/document\//i.test(item.href);
+            const isExportLink = /\/export(\?|$)/i.test(item.href);
+            const hasKnownExt = /\.(pdf|docx|doc|xlsx|pptx)(\?|$)/i.test(item.href);
+
+            const linkOpen = document.createElement('a');
+            linkOpen.href = item.href;
+            linkOpen.target = '_blank';
+            linkOpen.rel = 'noopener noreferrer';
+            linkOpen.textContent = isGoogleDoc ? '📂 Abrir en Drive' : '🔍 Ver';
+            linkOpen.style.textDecoration = 'none';
+            linkOpen.style.color = 'var(--brand-primary)';
+
+            actions.appendChild(linkOpen);
+
+            if (isExportLink || hasKnownExt) {
+                const linkDownload = document.createElement('a');
+                linkDownload.href = item.href;
+                linkDownload.download = '';
+                linkDownload.textContent = '📥 Descargar';
+                linkDownload.style.textDecoration = 'none';
+                linkDownload.style.background = 'linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%)';
+                linkDownload.style.color = 'var(--primary-contrast)';
+                linkDownload.style.padding = '6px 10px';
+                linkDownload.style.borderRadius = '6px';
+                actions.appendChild(linkDownload);
+            } else {
+                const hint = document.createElement('div');
+                hint.textContent = 'Formato original en Drive';
+                hint.style.fontSize = '12px';
+                hint.style.color = '#888';
+                actions.appendChild(hint);
+            }
+
+            const meta = document.createElement('div');
+            meta.style.fontSize = '13px';
+            meta.style.color = '#666';
+            meta.textContent = item.type ? item.type.toUpperCase() : (item.href.split('.').pop() || '').toUpperCase();
+
+            card.appendChild(icon);
+            card.appendChild(title);
+            card.appendChild(meta);
+            card.appendChild(actions);
+
+            frag.appendChild(card);
+        });
+
+        this.modelosContainer.appendChild(frag);
     }
 
     // MÓDULO DE PERSONAL ACTIVO
