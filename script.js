@@ -10,6 +10,7 @@ class GestorRecibos {
         this.HOJA_MedicinaLaboral = 'Medicina Laboral';
         this.HOJA_RECATEGORIZACION = "datos_recategorizacion";
         this.HOJA_Escalafon = "Escalafon";
+        this.HOJA_Recibos = 'datos_recibos';
 
         this.usuarios = {};
         this.usuarioActual = null;
@@ -363,6 +364,11 @@ class GestorRecibos {
                     📥 Cargar Recibos
                 </button>
                 
+        <button id="uploadBtn" style="padding: 10px 20px; background: #00a86b; color: var(--primary-contrast); border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;">
+                    ⬆️ Subir Recibo
+                </button>
+                <input id="uploadInput" type="file" accept="application/pdf,image/*" multiple style="display:none">
+
         <button id="clearBtn" style="padding: 10px 15px; background: var(--neutral); color: var(--primary-contrast); border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
                     🗑️ Limpiar
                 </button>
@@ -376,12 +382,272 @@ class GestorRecibos {
         this.cargando = document.getElementById('loading');
         this.contenedorRecibos = document.getElementById('recibosContainer');
         this.inputLegajo = document.getElementById('legajoInput');
+        this.uploadBtn = document.getElementById('uploadBtn');
+        this.uploadInput = document.getElementById('uploadInput');
+        this.cargarRecibosDesdeStorage();
+        try {
+            if (this.selectorDependencia && this.selectorDependencia.options.length <= 1 && this.usuarioActual && this.usuarioActual.dependencia) {
+                const opcion = document.createElement('option');
+                opcion.value = this.usuarioActual.dependencia;
+                opcion.textContent = this.usuarioActual.dependencia;
+                this.selectorDependencia.appendChild(opcion);
+                this.selectorDependencia.value = this.usuarioActual.dependencia;
+                // Si no es superadmin, mantenemos el selector deshabilitado para reflejar permisos
+                if (this.usuarioActual.role !== 'superadmin') {
+                    this.selectorDependencia.disabled = true;
+                    this.selectorDependencia.style.backgroundColor = '#f8f9fa';
+                }
+            }
+        } catch (e) {
+            console.warn('No se pudo auto-popular dependencia:', e);
+        }
     }
 
     configurarEventos() {
         this.botonCargar.addEventListener('click', () => this.cargarRecibos());
     this.inputLegajo.addEventListener('input', this.debounce(() => this.filtrarPorLegajo(), 200));
         document.getElementById('clearBtn').addEventListener('click', () => this.limpiarFiltros());
+        if (this.uploadBtn && this.uploadInput) {
+            this.uploadBtn.addEventListener('click', () => this.uploadInput.click());
+            this.uploadInput.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files || []);
+                if (files.length) this.handleUploadFiles(files);
+                e.target.value = '';
+            });
+        }
+    }
+    handleUploadFiles(files) {
+        this.mostrarFormularioCarga(files);
+    }
+
+    mostrarFormularioCarga(files) {
+        const overlay = document.createElement('div');
+        overlay.id = 'uploadModalOverlay';
+        overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; z-index:9999;';
+
+        const ahora = new Date();
+        const fechaHoy = ahora.toISOString().split('T')[0];
+        const anioActual = ahora.getFullYear();
+
+        const filesListHTML = files.map(f => `<li>${f.name} (${Math.round(f.size/1024)} KB)</li>`).join('');
+
+        overlay.innerHTML = `
+            <div style="background:var(--surface); padding:18px; border-radius:10px; width:420px; max-width:95%; box-shadow:0 10px 30px rgba(0,0,0,0.3);">
+                <h3 style="margin:0 0 8px 0;">Subir Recibo </h3>
+                <p style="margin:0 0 12px 0; color:#555; font-size:14px">Archivos seleccionados:</p>
+                <ul style="max-height:90px; overflow:auto; padding-left:18px; margin:0 0 12px 0;">${filesListHTML}</ul>
+
+                <label style="display:block; font-weight:bold; margin-bottom:6px">Fecha</label>
+                <input type="date" id="modalFechaRecibo" value="${fechaHoy}" style="width:100%; padding:8px; margin-bottom:10px; border:1px solid var(--border); border-radius:6px">
+
+                <label style="display:block; font-weight:bold; margin-bottom:6px">Legajo</label>
+                <input type="text" id="modalLegajoRecibo" value="${(this.inputLegajo && this.inputLegajo.value) || ''}" placeholder="Ej: 12345" style="width:100%; padding:8px; margin-bottom:10px; border:1px solid var(--border); border-radius:6px">
+
+                <div style="display:flex; gap:8px; margin-bottom:10px;">
+                    <div style="flex:1">
+                        <label style="display:block; font-weight:bold; margin-bottom:6px">Mes</label>
+                        <select id="modalMesRecibo" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:6px">
+                            <option value="">Seleccione mes</option>
+                            <option value="1">Enero</option>
+                            <option value="2">Febrero</option>
+                            <option value="3">Marzo</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Mayo</option>
+                            <option value="6">Junio</option>
+                            <option value="7">Julio</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                    </div>
+                    <div style="width:110px">
+                        <label style="display:block; font-weight:bold; margin-bottom:6px">Año</label>
+                        <select id="modalAnioRecibo" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:6px">
+                            <option value="${anioActual}">${anioActual}</option>
+                            <option value="${anioActual-1}">${anioActual-1}</option>
+                            <option value="${anioActual+1}">${anioActual+1}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:8px; justify-content:flex-end;">
+                    <button id="modalCancelarBtn" style="padding:8px 12px; background:#eee; border-radius:6px; border:1px solid #ddd">Cancelar</button>
+                    <button id="modalSubirBtn" style="padding:8px 12px; background:linear-gradient(135deg,var(--brand-primary),var(--brand-secondary)); color:var(--primary-contrast); border-radius:6px; border:none">Subir Recibo</button>
+                </div>
+                <div id="modalProgress" style="margin-top:10px; display:none; font-size:13px"></div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        const cancelar = document.getElementById('modalCancelarBtn');
+        const subir = document.getElementById('modalSubirBtn');
+        const progress = document.getElementById('modalProgress');
+
+        cancelar.addEventListener('click', () => overlay.remove());
+
+        subir.addEventListener('click', async () => {
+            const fecha = document.getElementById('modalFechaRecibo').value;
+            const legajo = document.getElementById('modalLegajoRecibo').value.trim();
+            const mes = document.getElementById('modalMesRecibo').value;
+            const anio = document.getElementById('modalAnioRecibo').value;
+
+            if (!fecha || !legajo || !mes || !anio) {
+                alert('Por favor complete fecha, legajo, mes y año antes de subir.');
+                return;
+            }
+
+            subir.disabled = true;
+            cancelar.disabled = true;
+            progress.style.display = 'block';
+            progress.textContent = '⏳ Subiendo archivos...';
+
+            try {
+                await this.uploadFilesToSheet(files, { fecha, legajo, mes, anio });
+                progress.textContent = '✅ Todos los recibos se cargaron correctamente.';
+                setTimeout(() => overlay.remove(), 1200);
+            } catch (err) {
+                console.error('Error subiendo recibos:', err);
+                progress.textContent = '❌ Ocurrió un error al subir. Ver consola.';
+                cancelar.disabled = false;
+            }
+        });
+    }
+
+    async uploadFilesToSheet(files, meta) {
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const base64 = await this.readFileAsBase64(file);
+
+            const uploadedAt = new Date().toLocaleString('es-AR');
+            const dependencia = (this.selectorDependencia && this.selectorDependencia.value) || (this.usuarioActual && this.usuarioActual.dependencia) || 'N/A';
+
+            const values = [
+                meta.fecha,
+                meta.legajo,
+                `${meta.mes}/${meta.anio}`,
+                file.name
+            ];
+
+            const payload = {
+                values,
+                file: {
+                    base64: base64.split(',')[1],
+                    type: file.type,
+                    name: file.name
+                }
+            };
+
+            let serverResp = null;
+            try {
+                serverResp = await this.enviarReciboAHoja(payload);
+                console.log('Respuesta del servidor al subir recibo:', serverResp);
+            } catch (err) {
+                console.error('Error enviando recibo a la hoja:', err);
+                throw err;
+            }
+
+            const serverFileUrl = serverResp && (serverResp.fileUrl || serverResp.url || serverResp.fileUrlDrive || serverResp.fileUrlDrive);
+            try {
+                const finalUrl = serverFileUrl || URL.createObjectURL(file);
+                this.todosLosRecibos.unshift({ name: file.name, url: finalUrl, size: file.size, type: file.type, legajo: meta.legajo, dependencia, uploadedAt: new Date().toISOString() });
+                this.guardarRecibosEnStorage();
+                this.mostrarRecibosSubidos();
+            } catch (e) {
+                console.warn('No se pudo crear URL local para el archivo:', e);
+            }
+        }
+    }
+
+    readFileAsBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onerror = () => reject(new Error('Error leyendo archivo'));
+            reader.onload = () => resolve(reader.result);
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async enviarReciboAHoja(payload) {
+        const APPS_SCRIPT_URL = `https://script.google.com/macros/s/AKfycbz0dgpx9Ywohz9PTZ4Uvdoo10I8Rrzhht-jQBA69h_bdOiIs_ApMhscFrkVGFv9ZIrs1Q/exec`;
+        try {
+            const enriched = { ...payload, sheetName: this.HOJA_Recibos, folderId: '1e79jWQOKnFqHegIlXOpDZw1cUfa_ZuBu' };
+            const res = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(enriched) });
+            if (!res.ok) throw new Error(`Apps Script respondió ${res.status}`);
+            try {
+                const json = await res.json();
+                return json;
+            } catch (parseErr) {
+                console.warn('Respuesta de Apps Script no es JSON:', parseErr);
+                return { ok: true };
+            }
+        } catch (err) {
+            console.error('Error enviando recibo a hoja:', err);
+            throw err;
+        }
+    }
+
+    mostrarRecibosSubidos() {
+
+        if (!this.contenedorRecibos) return;
+
+        const uploaded = this.todosLosRecibos.filter(r => r.url);
+        const html = [];
+        if (uploaded.length === 0) {
+            return;
+        }
+
+        html.push('<div id="uploadedReceipts" style="margin-bottom:20px">');
+        html.push('<h3 style="text-align:center; margin-bottom:10px;">Recibos subidos (sesión)</h3>');
+        uploaded.forEach((r, idx) => {
+            const sizeKb = r.size ? Math.round(r.size / 1024) + ' KB' : '';
+            html.push(`
+                <div class="recibo-card" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                    <div style="flex:1">
+                        <div class="recibo-title">${r.name}</div>
+                        <div class="recibo-details" style="margin-top:6px; display:flex; gap:12px; flex-wrap:wrap;">
+                            <div class="detail-item"><div class="detail-label">Legajo</div><div class="detail-value">${r.legajo}</div></div>
+                            <div class="detail-item"><div class="detail-label">Dependencia</div><div class="detail-value">${r.dependencia}</div></div>
+                            <div class="detail-item"><div class="detail-label">Subido</div><div class="detail-value">${new Date(r.uploadedAt).toLocaleString()}</div></div>
+                            <div class="detail-item"><div class="detail-label">Tamaño</div><div class="detail-value">${sizeKb}</div></div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center">
+                        <a class="download-btn" href="${r.url}" download="${r.name}">Ver / Descargar</a>
+                        <button class="download-btn" style="background:#e74c3c" data-index="${idx}">Eliminar</button>
+                    </div>
+                </div>
+            `);
+        });
+        html.push('</div>');
+
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = html.join('');
+        const old = document.getElementById('uploadedReceipts');
+        if (old) old.remove();
+        this.contenedorRecibos.prepend(wrapper);
+        wrapper.querySelectorAll('button[data-index]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const i = parseInt(btn.getAttribute('data-index'));
+                this.eliminarReciboSubido(i);
+            });
+        });
+    }
+
+    eliminarReciboSubido(idx) {
+        const uploaded = this.todosLosRecibos.filter(r => r.url);
+        const target = uploaded[idx];
+        if (!target) return;
+        if (target.url) URL.revokeObjectURL(target.url);
+        const findIndex = this.todosLosRecibos.findIndex(r => r.name === target.name && r.uploadedAt === target.uploadedAt);
+        if (findIndex !== -1) this.todosLosRecibos.splice(findIndex, 1);
+        this.mostrarRecibosSubidos();
+    }
+
+    cargarRecibosDesdeStorage() {
+    this.todosLosRecibos = [];
     }
 
     async cargarDependenciasRestringidas() {
