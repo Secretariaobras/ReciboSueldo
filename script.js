@@ -59,6 +59,8 @@ class GestorRecibos {
         this.inputLegajoRecategorizacion = null;
         this.botonBuscarRecategorizacion = null;
         this.recategorizacionDatos = null;
+        this.recategorizacionLista = [];
+        this.categoriasDisponibles = [];
 
         // Variables para accidentes
         this.formularioAccidente = null;
@@ -917,6 +919,8 @@ class GestorRecibos {
     mostrarModuloRecategorizacion() {
         document.body.innerHTML = this.obtenerHTMLRecategorizacion();
         this.inicializarReferenciasDOMRecategorizacion();
+        // Cargar categorías disponibles para usar en la lista
+        this.cargarCategoriasRecategorizacion().catch(e => console.warn('No se pudieron cargar categorías:', e));
     }
 
     obtenerHTMLRecategorizacion() {
@@ -949,9 +953,22 @@ class GestorRecibos {
                     style="padding: 10px 16px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold;">
                     🔍 Buscar
                 </button>
+                <button id="agregarBtnRecategorizacion" title="Agregar legajo a la lista" 
+                    style="padding: 10px 12px; background: #6c757d; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">
+                    ➕ Agregar a Lista
+                </button>
+                <button id="limpiarListaRecategorizacion" title="Limpiar lista de legajos" 
+                    style="padding: 10px 12px; background: #adb5bd; color: #222; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">
+                    🗑️ Limpiar Lista
+                </button>
                 <button onclick="gestorRecibos.mostrarMenuPrincipal()" style="padding: 8px 15px; background: var(--neutral); color: var(--primary-contrast); border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
                     ⬅️ Volver al Menú Principal
                 </button>
+                <div style="width:100%; display:flex; justify-content:center; margin-top:8px;">
+                    <button id="enviarListaRecategorizacionBtn" style="padding: 10px 18px; background: #007bff; color: white; border: none; border-radius: 6px; font-size: 15px; cursor: pointer; font-weight:bold; display:none;">
+                        📤 Enviar Lista de Recategorizaciones
+                    </button>
+                </div>
             </div>
         `;
     }
@@ -961,6 +978,9 @@ class GestorRecibos {
         this.contenedorRecibos = document.getElementById('recategorizacionContainer');
         this.inputLegajoRecategorizacion = document.getElementById('legajoInputRecategorizacion');
         this.botonBuscarRecategorizacion = document.getElementById('buscarBtnRecategorizacion');
+        this.botonAgregarRecategorizacion = document.getElementById('agregarBtnRecategorizacion');
+        this.botonLimpiarListaRecategorizacion = document.getElementById('limpiarListaRecategorizacion');
+        this.botonEnviarListaRecategorizacion = document.getElementById('enviarListaRecategorizacionBtn');
 
         if (this.botonBuscarRecategorizacion) {
             this.botonBuscarRecategorizacion.addEventListener('click', () => this.buscarLegajoRecategorizacion());
@@ -973,6 +993,9 @@ class GestorRecibos {
                 }
             });
         }
+        if (this.botonAgregarRecategorizacion) this.botonAgregarRecategorizacion.addEventListener('click', () => this.agregarAListaRecategorizacion());
+        if (this.botonLimpiarListaRecategorizacion) this.botonLimpiarListaRecategorizacion.addEventListener('click', () => { this.recategorizacionLista = []; this.actualizarRenderListaRecategorizacion(); });
+        if (this.botonEnviarListaRecategorizacion) this.botonEnviarListaRecategorizacion.addEventListener('click', () => this.enviarListaRecategorizacion());
     }
 
     async buscarLegajoRecategorizacion() {
@@ -1018,8 +1041,13 @@ class GestorRecibos {
             // Obtener categorías desde HOJA_Escalafon (columna A)
             let opcionesCategorias = '<option value="">Seleccione una categoría</option>';
             try {
-                const datosEsc = await this.obtenerDatosHoja(`${this.HOJA_Escalafon}!A:A`);
-                const categorias = [...new Set((datosEsc?.values || []).slice(1).map(f => f[0]).filter(Boolean))];
+                // Reusar categorías cargadas previamente si existen
+                let categorias = this.categoriasDisponibles && this.categoriasDisponibles.length ? this.categoriasDisponibles : [];
+                if (!categorias || categorias.length === 0) {
+                    const datosEsc = await this.obtenerDatosHoja(`${this.HOJA_Escalafon}!A:A`);
+                    categorias = [...new Set((datosEsc?.values || []).slice(1).map(f => f[0]).filter(Boolean))];
+                    this.categoriasDisponibles = categorias;
+                }
                 if (categorias.length > 0) {
                     opcionesCategorias += categorias.map(c => `<option value="${c}">${c}</option>`).join('');
                 }
@@ -1076,6 +1104,18 @@ class GestorRecibos {
         }
     }
 
+    // Carga categorías desde la hoja de escalafón para usarlas en selects por ítem
+    async cargarCategoriasRecategorizacion() {
+        try {
+            const datosEsc = await this.obtenerDatosHoja(`${this.HOJA_Escalafon}!A:A`);
+            const categorias = [...new Set((datosEsc?.values || []).slice(1).map(f => f[0]).filter(Boolean))];
+            this.categoriasDisponibles = categorias;
+        } catch (e) {
+            console.warn('Error cargando categorias de escalafon:', e);
+            this.categoriasDisponibles = [];
+        }
+    }
+
     async solicitarRecategorizacion() {
         const btn = document.getElementById('solicitarRecategorizacionBtn');
         const select = document.getElementById('categoriaSolicitadaSelect');
@@ -1099,7 +1139,17 @@ class GestorRecibos {
         }
 
         try {
-            await this.enviarRecategorizacionAHoja([legajo, nombre, categoriaActual, categoriaSolicitada]);
+            // Si hay lista activa y contiene elementos, se envía la lista en lote
+            if (this.recategorizacionLista && this.recategorizacionLista.length > 0) {
+                // Enviar cada elemento con la categoria seleccionada (o si cada elemento ya tiene categoriaSolicitada individual, usarla)
+                const payloads = this.recategorizacionLista.map(item => [item.legajo, item.nombre, item.categoriaActual, categoriaSolicitada]);
+                // Enviar los payloads uno por uno para mantener compatibilidad con Apps Script actual
+                for (const p of payloads) {
+                    await this.enviarRecategorizacionAHoja(p);
+                }
+            } else {
+                await this.enviarRecategorizacionAHoja([legajo, nombre, categoriaActual, categoriaSolicitada]);
+            }
             if (msg) {
                 msg.style.display = 'block';
                 msg.style.backgroundColor = '#d4edda';
@@ -1122,6 +1172,142 @@ class GestorRecibos {
                 btn.textContent = '📝 Solicitar Recategorización';
                 btn.style.opacity = '1';
             }
+            // Si se envió una lista, limpiarla
+            if (this.recategorizacionLista && this.recategorizacionLista.length > 0) {
+                this.recategorizacionLista = [];
+                this.actualizarRenderListaRecategorizacion();
+            }
+        }
+    }
+
+    // Agrega el legajo actual (o uno ingresado) a la lista de recategorizacion
+    agregarAListaRecategorizacion() {
+        const legajo = (this.inputLegajoRecategorizacion?.value || '').trim();
+        if (!legajo) {
+            alert('Ingrese un legajo antes de agregar a la lista');
+            this.inputLegajoRecategorizacion?.focus();
+            return;
+        }
+        if (!/^\d+$/.test(legajo)) {
+            alert('El legajo debe ser numérico');
+            this.inputLegajoRecategorizacion?.focus();
+            return;
+        }
+
+        // Buscar datos en Personal Activo para completar nombre y categoria actual
+        this.obtenerDatosHoja(`${this.HOJA_PersonalActivo}!A:D`).then(datos => {
+            const filas = datos?.values?.slice(1) || [];
+            const fila = filas.find(f => String(f[0] || '').trim() === legajo);
+            const leg = fila ? (fila[0] || legajo) : legajo;
+            const nom = fila ? (fila[1] || 'N/A') : 'N/A';
+            const cat = fila ? (fila[2] || 'N/A') : 'N/A';
+
+            // Evitar duplicados
+            if (this.recategorizacionLista.some(r => r.legajo === leg)) {
+                alert('El legajo ya está en la lista');
+                return;
+            }
+
+            this.recategorizacionLista.push({ legajo: leg, nombre: nom, categoriaActual: cat });
+            this.actualizarRenderListaRecategorizacion();
+            this.inputLegajoRecategorizacion.value = '';
+            this.inputLegajoRecategorizacion.focus();
+        }).catch(err => {
+            console.error('Error obteniendo datos para agregar a lista:', err);
+            alert('No se pudieron obtener datos para el legajo. Aún así se agregará con información mínima.');
+            if (!this.recategorizacionLista.some(r => r.legajo === legajo)) {
+                this.recategorizacionLista.push({ legajo: legajo, nombre: 'N/A', categoriaActual: 'N/A' });
+                this.actualizarRenderListaRecategorizacion();
+            }
+        });
+    }
+
+    // Remover un legajo de la lista por índice
+    removerDeListaRecategorizacion(index) {
+        if (index >= 0 && index < this.recategorizacionLista.length) {
+            this.recategorizacionLista.splice(index, 1);
+            this.actualizarRenderListaRecategorizacion();
+        }
+    }
+
+    // Actualiza la UI que muestra la lista de legajos y muestra/oculta boton de envio
+    actualizarRenderListaRecategorizacion() {
+        const container = document.getElementById('recategorizacionContainer');
+        const enviarBtn = document.getElementById('enviarListaRecategorizacionBtn');
+        if (!container) return;
+        if (!this.recategorizacionLista || this.recategorizacionLista.length === 0) {
+            container.innerHTML = '';
+            if (enviarBtn) enviarBtn.style.display = 'none';
+            return;
+        }
+
+        if (enviarBtn) enviarBtn.style.display = 'inline-block';
+
+        // Construir opciones de select desde categoriasDisponibles
+        const opciones = ['<option value="">(Sin seleccionar)</option>']
+            .concat((this.categoriasDisponibles || []).map(c => `<option value="${c}">${c}</option>`)).join('');
+
+        const html = this.recategorizacionLista.map((r, idx) => {
+            const selectedValue = r.categoriaSolicitada ? r.categoriaSolicitada : '';
+            return `
+                <div style="background: var(--surface); padding:10px; border-radius:8px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.06);">
+                    <div style="flex:1;">
+                        <div style="font-weight:bold;">${r.nombre} (Legajo: ${r.legajo})</div>
+                        <div style="color: #666; font-size:13px;">Categoria Actual: ${r.categoriaActual}</div>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <select id="categoria_item_${idx}" onchange="(function(i){ return function(e){ gestorRecibos.recategorizacionLista[i].categoriaSolicitada = e.target.value } } )(${idx}).call(null,event)" style="padding:6px 8px; border-radius:6px; border:1px solid #ccc; min-width:200px;">
+                            ${opciones.replace(/value="${selectedValue}"/, `value="${selectedValue}" selected`)}
+                        </select>
+                        <button onclick="gestorRecibos.removerDeListaRecategorizacion(${idx})" style="padding:6px 10px; border-radius:6px; background:#e74c3c; color:white; border:none; cursor:pointer;">Eliminar</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        container.innerHTML = `
+            <div style="margin-top:12px;">
+                <h3 style="text-align:center;">Lista de Recategorizaciones (${this.recategorizacionLista.length})</h3>
+                ${html}
+                <div style="text-align:center; margin-top:8px; font-size:13px; color:#555;">Antes de enviar, seleccione la categoría solicitada en cualquier tarjeta individual o use el botón de enviar para aplicar la misma categoría a todos.</div>
+            </div>
+        `;
+    }
+
+    // Enviar la lista completa a la hoja de recategorizacion
+    async enviarListaRecategorizacion() {
+        if (!this.recategorizacionLista || this.recategorizacionLista.length === 0) {
+            alert('La lista está vacía');
+            return;
+        }
+
+        // Verificar si todos los ítems tienen categoriaSolicitada
+        const sinCategoria = this.recategorizacionLista.filter(r => !r.categoriaSolicitada || r.categoriaSolicitada.trim() === '');
+        let categoriaComun = null;
+        if (sinCategoria.length > 0) {
+            categoriaComun = prompt(`Hay ${sinCategoria.length} legajos sin categoría solicitada. Ingrese una categoría común para esos legajos, o cancele para abortar:`);
+            if (!categoriaComun) {
+                alert('Envio cancelado. Complete las categorías o ingrese una categoría común.');
+                return;
+            }
+        }
+
+        const btn = document.getElementById('enviarListaRecategorizacionBtn');
+        if (btn) { btn.disabled = true; btn.textContent = '⏳ Enviando...'; }
+
+        try {
+            for (const item of this.recategorizacionLista) {
+                const cat = (item.categoriaSolicitada && item.categoriaSolicitada.trim()) ? item.categoriaSolicitada : categoriaComun;
+                await this.enviarRecategorizacionAHoja([item.legajo, item.nombre, item.categoriaActual, cat]);
+            }
+            alert('Lista enviada correctamente');
+            this.recategorizacionLista = [];
+            this.actualizarRenderListaRecategorizacion();
+        } catch (err) {
+            console.error('Error enviando lista:', err);
+            alert('Ocurrió un error al enviar la lista. Revise la consola.');
+        } finally {
+            if (btn) { btn.disabled = false; btn.textContent = '📤 Enviar Lista de Recategorizaciones'; }
         }
     }
 
