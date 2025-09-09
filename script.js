@@ -15,9 +15,8 @@ class GestorRecibos {
         this.usuarios = {};
         this.usuarioActual = null;
 
-    // Cache simple para respuestas de Google Sheets (TTL 5 minutos)
-    this._cache = new Map();
-    this._cacheTTL = 5 * 60 * 1000;
+        this._cache = new Map();
+        this._cacheTTL = 5 * 60 * 1000;
 
         // Variables para recibos
         this.recibosFiltrados = [];
@@ -224,7 +223,7 @@ class GestorRecibos {
     }
 
     obtenerHTMLMenu() {
-    return `
+        return `
             <div class="menu-page">
                 <div class="menu-card">
                     ${this.obtenerHTMLHeaderMenu()}
@@ -292,7 +291,6 @@ class GestorRecibos {
         });
     }
 
-    // Utilidades
     debounce(fn, delay = 250) {
         let t;
         return (...args) => {
@@ -325,7 +323,7 @@ class GestorRecibos {
     }
 
     obtenerHTMLInterfaz() {
-    return `
+        return `
             <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
         <div class="header" style="background: var(--surface); padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
                     ${this.obtenerHTMLHeader()}
@@ -348,11 +346,11 @@ class GestorRecibos {
     }
 
     obtenerHTMLHeader() {
-    return this.getUserHeaderHTML('📋 Sistema de Gestión de Recibos');
+        return this.getUserHeaderHTML('📋 Sistema de Gestión de Recibos');
     }
 
     obtenerHTMLControles() {
-    return `
+        return `
             <div class="controls" style="display: flex; gap: 15px; align-items: center; justify-content: center; flex-wrap: wrap;">
         <select id="dependenciaSelect" style="padding: 10px; border: 2px solid var(--border); border-radius: 5px; font-size: 16px; min-width: 200px;">
                     <option value="">Selecciona una dependencia</option>
@@ -405,7 +403,7 @@ class GestorRecibos {
 
     configurarEventos() {
         this.botonCargar.addEventListener('click', () => this.cargarRecibos());
-    this.inputLegajo.addEventListener('input', this.debounce(() => this.filtrarPorLegajo(), 200));
+        this.inputLegajo.addEventListener('input', this.debounce(() => this.filtrarPorLegajo(), 200));
         document.getElementById('clearBtn').addEventListener('click', () => this.limpiarFiltros());
         if (this.uploadBtn && this.uploadInput) {
             this.uploadBtn.addEventListener('click', () => this.uploadInput.click());
@@ -429,7 +427,7 @@ class GestorRecibos {
         const fechaHoy = ahora.toISOString().split('T')[0];
         const anioActual = ahora.getFullYear();
 
-        const filesListHTML = files.map(f => `<li>${f.name} (${Math.round(f.size/1024)} KB)</li>`).join('');
+        const filesListHTML = files.map(f => `<li>${f.name} (${Math.round(f.size / 1024)} KB)</li>`).join('');
 
         overlay.innerHTML = `
             <div style="background:var(--surface); padding:18px; border-radius:10px; width:420px; max-width:95%; box-shadow:0 10px 30px rgba(0,0,0,0.3);">
@@ -466,8 +464,8 @@ class GestorRecibos {
                         <label style="display:block; font-weight:bold; margin-bottom:6px">Año</label>
                         <select id="modalAnioRecibo" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:6px">
                             <option value="${anioActual}">${anioActual}</option>
-                            <option value="${anioActual-1}">${anioActual-1}</option>
-                            <option value="${anioActual+1}">${anioActual+1}</option>
+                            <option value="${anioActual - 1}">${anioActual - 1}</option>
+                            <option value="${anioActual + 1}">${anioActual + 1}</option>
                         </select>
                     </div>
                 </div>
@@ -647,7 +645,7 @@ class GestorRecibos {
     }
 
     cargarRecibosDesdeStorage() {
-    this.todosLosRecibos = [];
+        this.todosLosRecibos = [];
     }
 
     async cargarDependenciasRestringidas() {
@@ -742,6 +740,7 @@ class GestorRecibos {
             }
 
             const encabezados = datos.values[0];
+            this.encabezadosRecibos = encabezados;
             const filas = datos.values.slice(2);
 
             // Si es superadmin y selecciona "TODOS", mostrar todos los recibos
@@ -1190,6 +1189,10 @@ class GestorRecibos {
                 <button id="loadBtnVacaciones" style="padding: 10px 20px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;">
                     🏖️ Cargar Vacaciones
                 </button>
+
+                <button id="exportBtnVacaciones" style="padding: 10px 16px; background: #0b74de; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">
+                    📥 Exportar Excel
+                </button>
                 
                 <button id="clearBtnVacaciones" style="padding: 10px 15px; background: var(--neutral); color: var(--primary-contrast); border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
                     🗑️ Limpiar
@@ -1208,8 +1211,10 @@ class GestorRecibos {
 
     configurarEventosVacaciones() {
         this.botonCargarVacaciones.addEventListener('click', () => this.cargarVacaciones());
-    this.inputLegajoVacaciones.addEventListener('input', this.debounce(() => this.filtrarPorLegajoVacaciones(), 200));
+        this.inputLegajoVacaciones.addEventListener('input', this.debounce(() => this.filtrarPorLegajoVacaciones(), 200));
         document.getElementById('clearBtnVacaciones').addEventListener('click', () => this.limpiarFiltrosVacaciones());
+        const expVac = document.getElementById('exportBtnVacaciones');
+        if (expVac) expVac.addEventListener('click', () => this.exportarVacacionesExcel());
     }
 
     async cargarDependenciasVacaciones() {
@@ -1453,6 +1458,10 @@ class GestorRecibos {
                 <button id="loadBtnBajas" style="padding: 10px 20px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;">
                     ⚠️ Cargar Bajas
                 </button>
+
+                <button id="exportBtnBajas" style="padding: 10px 16px; background: #0b74de; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">
+                    📥 Exportar Excel
+                </button>
                 
                 <button id="clearBtnBajas" style="padding: 10px 15px; background: var(--neutral); color: var(--primary-contrast); border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
                     🗑️ Limpiar
@@ -1471,8 +1480,10 @@ class GestorRecibos {
 
     configurarEventosBajas() {
         this.botonCargarBajas.addEventListener('click', () => this.cargarBajas());
-    this.inputLegajoBajas.addEventListener('input', this.debounce(() => this.filtrarPorLegajoBajas(), 200));
+        this.inputLegajoBajas.addEventListener('input', this.debounce(() => this.filtrarPorLegajoBajas(), 200));
         document.getElementById('clearBtnBajas').addEventListener('click', () => this.limpiarFiltrosBajas());
+        const expBajas = document.getElementById('exportBtnBajas');
+        if (expBajas) expBajas.addEventListener('click', () => this.exportarBajasExcel());
     }
 
     async cargarDependenciasBajas() {
@@ -1536,6 +1547,7 @@ class GestorRecibos {
             }
 
             const encabezados = datos.values[0];
+            this.encabezadosBajas = encabezados;
             const filas = datos.values.slice(1);
 
             if (this.usuarioActual.role === 'superadmin' && dependenciaSeleccionada === 'TODOS') {
@@ -1872,6 +1884,10 @@ class GestorRecibos {
                 <button id="loadBtnPersonalActivo" style="padding: 10px 20px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%); color: var(--primary-contrast); border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;">
                     👥 Cargar Personal
                 </button>
+
+                <button id="exportBtnPersonalActivo" style="padding: 10px 16px; background: #0b74de; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">
+                    📥 Exportar Excel
+                </button>
                 
                 <button id="clearBtnPersonalActivo" style="padding: 10px 15px; background: var(--neutral); color: var(--primary-contrast); border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
                     🗑️ Limpiar
@@ -1890,8 +1906,10 @@ class GestorRecibos {
 
     configurarEventosPersonalActivo() {
         this.botonCargarPersonalActivo.addEventListener('click', () => this.cargarPersonalActivo());
-    this.inputLegajoPersonalActivo.addEventListener('input', this.debounce(() => this.filtrarPorLegajoPersonalActivo(), 200));
+        this.inputLegajoPersonalActivo.addEventListener('input', this.debounce(() => this.filtrarPorLegajoPersonalActivo(), 200));
         document.getElementById('clearBtnPersonalActivo').addEventListener('click', () => this.limpiarFiltrosPersonalActivo());
+        const expPA = document.getElementById('exportBtnPersonalActivo');
+        if (expPA) expPA.addEventListener('click', () => this.exportarPersonalActivoExcel());
     }
 
     async cargarDependenciasPersonalActivo() {
@@ -1954,6 +1972,7 @@ class GestorRecibos {
             }
 
             const encabezados = datos.values[0];
+            this.encabezadosPersonalActivo = encabezados;
             const filas = datos.values.slice(1);
 
             if (this.usuarioActual.role === 'superadmin' && dependenciaSeleccionada === 'TODOS') {
@@ -2273,7 +2292,7 @@ class GestorRecibos {
 
         this.botonGuardarAccidente.disabled = true;
         this.botonGuardarAccidente.textContent = '⏳ Guardando...';
-    this.botonGuardarAccidente.style.background = 'var(--neutral)';
+        this.botonGuardarAccidente.style.background = 'var(--neutral)';
 
         try {
             const datosAccidente = this.recopilarDatosAccidente();
@@ -2416,7 +2435,7 @@ class GestorRecibos {
     restaurarBotonGuardar() {
         this.botonGuardarAccidente.disabled = false;
         this.botonGuardarAccidente.textContent = '🚨 Registrar Accidente';
-    this.botonGuardarAccidente.style.background = 'linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%)';
+        this.botonGuardarAccidente.style.background = 'linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%)';
     }
 
     // MÓDULO DE MEDICINA LABORAL
@@ -2621,7 +2640,7 @@ class GestorRecibos {
     toggleTipoCantidadMedicinaLaboral() {
         const esDias = this.radioTipoDiasML.checked;
         this.campoDiasML.style.display = esDias ? 'block' : 'none';
-    this.campoHorasML.style.display = esDias ? 'none' : 'block';
+        this.campoHorasML.style.display = esDias ? 'none' : 'block';
         this.inputCantidadDiasMedicinaLaboral.required = esDias;
         this.inputCantidadHorasMedicinaLaboral.required = !esDias;
         if (esDias) {
@@ -2638,7 +2657,7 @@ class GestorRecibos {
 
         this.botonGuardarMedicinaLaboral.disabled = true;
         this.botonGuardarMedicinaLaboral.textContent = '⏳ Subiendo archivo y guardando...';
-    this.botonGuardarMedicinaLaboral.style.background = 'var(--neutral)';
+        this.botonGuardarMedicinaLaboral.style.background = 'var(--neutral)';
 
         try {
             let datosMedicinaLaboral = this.recopilarDatosMedicinaLaboral();
@@ -2844,7 +2863,82 @@ class GestorRecibos {
     restaurarBotonGuardarMedicinaLaboral() {
         this.botonGuardarMedicinaLaboral.disabled = false;
         this.botonGuardarMedicinaLaboral.textContent = '🏥 Registrar Medicina Laboral';
-    this.botonGuardarMedicinaLaboral.style.background = 'linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%)';
+        this.botonGuardarMedicinaLaboral.style.background = 'linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%)';
+    }
+
+    exportarArrayAExcel(arrayDeFilas, nombreArchivo = 'export.xlsx', encabezados = null) {
+        try {
+            const datos = [];
+
+            // Si recibimos un array de objetos y no se proporcionaron encabezados,
+            // inferimos encabezados desde las claves del primer objeto.
+            let filasProcesadas = [];
+            if (arrayDeFilas.length > 0 && typeof arrayDeFilas[0] === 'object' && !Array.isArray(arrayDeFilas[0])) {
+                if (!encabezados || !Array.isArray(encabezados)) {
+                    encabezados = Object.keys(arrayDeFilas[0]);
+                }
+                filasProcesadas = arrayDeFilas.map(obj => encabezados.map(k => obj[k] ?? ''));
+            } else {
+                filasProcesadas = arrayDeFilas.map(f => {
+                    if (Array.isArray(f)) return f;
+                    if (typeof f === 'object' && f !== null) return Object.values(f);
+                    return [f];
+                });
+            }
+
+            if (encabezados && Array.isArray(encabezados)) {
+                datos.push(encabezados);
+            }
+
+            filasProcesadas.forEach(r => datos.push(r));
+
+            const ws = XLSX.utils.aoa_to_sheet(datos);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Datos');
+
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([wbout], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nombreArchivo;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch (e) {
+            console.error('Error exportando a Excel:', e);
+            alert('Ocurrió un error al exportar a Excel. Revisa la consola.');
+        }
+    }
+
+    exportarVacacionesExcel() {
+        if (!this.vacacionesFiltradas || this.vacacionesFiltradas.length === 0) {
+            alert('No hay datos de vacaciones para exportar');
+            return;
+        }
+        // Usar encabezados de la hoja si están disponibles
+        const encabezados = this.encabezadosVacaciones || null;
+        this.exportarArrayAExcel(this.vacacionesFiltradas, `vacaciones_${(new Date()).toISOString().slice(0, 10)}.xlsx`, encabezados);
+    }
+
+    exportarBajasExcel() {
+        if (!this.bajasFiltradas || this.bajasFiltradas.length === 0) {
+            alert('No hay datos de bajas para exportar');
+            return;
+        }
+        const encabezados = null; // no siempre hay encabezados almacenados
+        this.exportarArrayAExcel(this.bajasFiltradas, `bajas_${(new Date()).toISOString().slice(0, 10)}.xlsx`, encabezados);
+    }
+
+    exportarPersonalActivoExcel() {
+        if (!this.personalActivoFiltrado || this.personalActivoFiltrado.length === 0) {
+            alert('No hay datos de personal activo para exportar');
+            return;
+        }
+        const encabezados = null;
+        this.exportarArrayAExcel(this.personalActivoFiltrado, `personal_activo_${(new Date()).toISOString().slice(0, 10)}.xlsx`, encabezados);
     }
 }
 
