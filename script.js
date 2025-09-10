@@ -1198,11 +1198,26 @@ class GestorRecibos {
         this.obtenerDatosHoja(`${this.HOJA_PersonalActivo}!A:D`).then(datos => {
             const filas = datos?.values?.slice(1) || [];
             const fila = filas.find(f => String(f[0] || '').trim() === legajo);
+            const isSuperAdmin = this.usuarioActual?.role === 'superadmin';
+
+            if (fila) {
+                const dependenciaFila = String(fila[3] || '').trim();
+                if (!isSuperAdmin && dependenciaFila !== (this.usuarioActual?.dependencia || '')) {
+                    alert(`No puede agregar legajos de otra dependencia (legajo ${legajo} pertenece a ${dependenciaFila}).`);
+                    return;
+                }
+            } else {
+                // Si no se encuentra la fila, solo superadmin puede agregar sin verificación
+                if (!isSuperAdmin) {
+                    alert('No se encontró el legajo en Personal Activo o pertenece a otra dependencia. Solo superadmin puede agregar legajos externos.');
+                    return;
+                }
+            }
+
             const leg = fila ? (fila[0] || legajo) : legajo;
             const nom = fila ? (fila[1] || 'N/A') : 'N/A';
             const cat = fila ? (fila[2] || 'N/A') : 'N/A';
 
-            // Evitar duplicados
             if (this.recategorizacionLista.some(r => r.legajo === leg)) {
                 alert('El legajo ya está en la lista');
                 return;
@@ -1214,7 +1229,11 @@ class GestorRecibos {
             this.inputLegajoRecategorizacion.focus();
         }).catch(err => {
             console.error('Error obteniendo datos para agregar a lista:', err);
-            alert('No se pudieron obtener datos para el legajo. Aún así se agregará con información mínima.');
+            const isSuperAdmin = this.usuarioActual?.role === 'superadmin';
+            if (!isSuperAdmin) {
+                alert('No se pudieron verificar los datos del legajo. Solo superadmin puede agregar legajos sin verificación.');
+                return;
+            }
             if (!this.recategorizacionLista.some(r => r.legajo === legajo)) {
                 this.recategorizacionLista.push({ legajo: legajo, nombre: 'N/A', categoriaActual: 'N/A' });
                 this.actualizarRenderListaRecategorizacion();
@@ -1222,7 +1241,6 @@ class GestorRecibos {
         });
     }
 
-    // Remover un legajo de la lista por índice
     removerDeListaRecategorizacion(index) {
         if (index >= 0 && index < this.recategorizacionLista.length) {
             this.recategorizacionLista.splice(index, 1);
@@ -1230,7 +1248,6 @@ class GestorRecibos {
         }
     }
 
-    // Actualiza la UI que muestra la lista de legajos y muestra/oculta boton de envio
     actualizarRenderListaRecategorizacion() {
         const container = document.getElementById('recategorizacionContainer');
         const enviarBtn = document.getElementById('enviarListaRecategorizacionBtn');
@@ -1417,7 +1434,6 @@ class GestorRecibos {
     }
 
     async cargarTodasLasDependenciasVacaciones() {
-        // Agregar opción para ver todos los datos
         const opcionTodos = document.createElement('option');
         opcionTodos.value = 'TODOS';
         opcionTodos.textContent = 'Ver Todas las Dependencias';

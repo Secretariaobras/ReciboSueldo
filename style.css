@@ -1,9 +1,7 @@
-/* --- Tema (colores centralizados) --- */
 :root {
-    /* Ajusta estos valores a la paleta oficial de la Municipalidad de San Miguel */
-    --brand-primary: #006a4e;       /* Sugerido: verde institucional */
-    --brand-secondary: #143d59;     /* Sugerido: azul institucional */
-    --brand-accent: #00a86b;        /* Sugerido: verde acento */
+    --brand-primary: #006a4e;
+    --brand-secondary: #143d59;
+    --brand-accent: #00a86b;
 
     --surface: #ffffff;
     --bg: #f5f7f9;
@@ -17,7 +15,7 @@
     --error-bg: #fdf2f2;
     --error-border: #f5c6cb;
 
-    --primary-contrast: #ffffff; /* texto sobre primario */
+    --primary-contrast: #ffffff;
 }
 
 /* --- Barra de herramientas de descargas --- */
