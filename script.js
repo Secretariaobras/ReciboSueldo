@@ -1202,12 +1202,12 @@ class GestorRecibos {
 
             if (fila) {
                 const dependenciaFila = String(fila[3] || '').trim();
-                if (!isSuperAdmin && dependenciaFila !== (this.usuarioActual?.dependencia || '')) {
+                const dependenciaUsuario = (this.usuarioActual?.dependencia || '').toString().trim();
+                if (!isSuperAdmin && dependenciaFila.toLowerCase() !== dependenciaUsuario.toLowerCase()) {
                     alert(`No puede agregar legajos de otra dependencia (legajo ${legajo} pertenece a ${dependenciaFila}).`);
                     return;
                 }
             } else {
-                // Si no se encuentra la fila, solo superadmin puede agregar sin verificación
                 if (!isSuperAdmin) {
                     alert('No se encontró el legajo en Personal Activo o pertenece a otra dependencia. Solo superadmin puede agregar legajos externos.');
                     return;
